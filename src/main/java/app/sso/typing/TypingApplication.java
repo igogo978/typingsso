@@ -10,6 +10,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.request.RequestContextListener;
 
 import java.io.BufferedReader;
@@ -18,13 +21,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 @SpringBootApplication
+@EnableAsync
 public class TypingApplication implements CommandLineRunner {
 
-//    @Autowired
-//    JdbcTemplate jdbcTemplate;
 
     @Autowired
     SchoolRepository repository;
@@ -38,13 +41,25 @@ public class TypingApplication implements CommandLineRunner {
         return new RequestContextListener();
     }
 
+
+    @Bean
+    public Executor asyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("GithubLookup-");
+        executor.initialize();
+        return executor;
+    }
+
+
     public static void main(String[] args) {
         SpringApplication.run(TypingApplication.class, args);
     }
 
     @Override
     public void run(String... strings) throws Exception {
-
 
 
         TimeZone.setDefault(TimeZone.getTimeZone("CST"));
@@ -75,14 +90,14 @@ public class TypingApplication implements CommandLineRunner {
 //            logger.info(String.format("%s:%s",school[0].toString(),school[1].toString()));
 //            logger.info(String.valueOf(repository.countBySchoolid(school[0].toString())));
 
-            if (repository.countBySchoolid(school[0].toString()) == 0 ) {
+            if (repository.countBySchoolid(school[0].toString()) == 0) {
                 repository.save(new School(school[0].toString(), school[1].toString()));
             }
 
         });
 
-        logger.info("query one school");
-        logger.info(repository.findBySchoolid("064609").getName());
+        logger.info("update tc school db ok.");
+//        logger.info(repository.findBySchoolid("064609").getName());
 
 //        logger.info("Querying for customer records where id = '064757':");
 //

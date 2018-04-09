@@ -9,6 +9,7 @@ import app.sso.typing.model.User;
 import app.sso.typing.model.user.Titles;
 import app.sso.typing.repository.UsageRepository;
 import app.sso.typing.service.OidcClient;
+import app.sso.typing.service.RandomMssqlPasswd;
 import app.sso.typing.service.UpdateMssql;
 import app.sso.typing.service.Userinfo;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -55,6 +56,9 @@ public class UserHomeController {
     @Autowired
     UpdateMssql updatemssql;
 
+    @Autowired
+    RandomMssqlPasswd randompasswd;
+
 
     @Value("${userinfo_endpoint}")
     private String userinfo_endpoint;
@@ -68,8 +72,7 @@ public class UserHomeController {
     private String typingpasswd;
 
     @RequestMapping("/typingsso/userhome")
-    public RedirectView userhome(RedirectAttributes attributes, HttpSession session) throws URISyntaxException, ParseException, IOException, ClassNotFoundException, SQLException, NoSuchAlgorithmException {
-        logger.info(String.format("session: %s", session.getAttribute("getToken")));
+    public RedirectView userhome(RedirectAttributes attributes, HttpSession session) throws URISyntaxException, ParseException, IOException, ClassNotFoundException, SQLException, NoSuchAlgorithmException, InterruptedException {
 
         if (!StringUtils.hasText(oidcClient.getAccessToken())) {
 //            沒有登入,返回登入首頁
@@ -106,10 +109,11 @@ public class UserHomeController {
             updatemssql.updateTeacherMssql(typingid, typingpasswd, user);
             //return new RedirectView("/typingsso/invalid");  //開放老師也能登入, 不再轉到invalid
 
+
         }
 
         //update login usage
-        userinfo.updateUsage(user,typingid);
+        userinfo.updateUsage(user, typingid);
 
         String base64id = Base64.getEncoder().encodeToString(typingid.getBytes());
         String base64passwd = Base64.getEncoder().encodeToString(typingpasswd.getBytes());
@@ -117,6 +121,14 @@ public class UserHomeController {
         attributes.addAttribute("userid", base64id);
         attributes.addAttribute("passwd", base64passwd);
         //return new RedirectView("http://163.17.63.98/typeweb2/pwd.asp");
+
+        //create a new thread for random user password
+        randompasswd.execute(typingid);
+
+//        if (user.getSub().equals("igogo")) {
+//            logger.info("catch igogo");
+//        }
+
 
         return new RedirectView("http://contest.tc.edu.tw/typeweb2/openidindex.asp?");
     }

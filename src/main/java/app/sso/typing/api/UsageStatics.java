@@ -3,13 +3,22 @@ package app.sso.typing.api;
 import app.sso.typing.model.Usage;
 import app.sso.typing.model.UsageReport;
 import app.sso.typing.repository.UsageRepository;
+import app.sso.typing.service.OidcClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URI;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -27,10 +36,24 @@ public class UsageStatics {
     @Autowired
     UsageRepository repository;
 
-    @RequestMapping(value = "/hours", method = RequestMethod.GET)
-    public List<UsageReport> byHours() {
+    @Autowired
+    OidcClient oidcClient;
 
-        List<UsageReport> reports = new ArrayList<>();
+    @RequestMapping(value = "/hours", method = RequestMethod.GET)
+    public List<UsageReport> byHours(HttpServletResponse response) throws IOException {
+        ArrayList<UsageReport> reports = new ArrayList<>();
+        if (!StringUtils.hasText(oidcClient.getAccessToken())) {
+//            沒有登入,返回登入首頁
+            logger.info("未取得access token");
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create("/"));
+
+            response.sendRedirect("/");
+
+        }
+
+
         long duration;
         //find all
 //        reports.add(findAll());
@@ -52,7 +75,20 @@ public class UsageStatics {
 
 
     @RequestMapping(value = "/days", method = RequestMethod.GET)
-    public List<UsageReport> byDays() {
+    public List<UsageReport> byDays(HttpServletResponse response) throws IOException {
+
+        if (!StringUtils.hasText(oidcClient.getAccessToken())) {
+//            沒有登入,返回登入首頁
+            logger.info("未取得access token");
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create("/"));
+
+            response.sendRedirect("/");
+
+        }
+
+
         List<UsageReport> reports = new ArrayList<>();
         long duration;
         //find all
@@ -92,6 +128,8 @@ public class UsageStatics {
     }
 
     public UsageReport findByHoursDuration(long endtime, long duration) {
+
+
         UsageReport report = new UsageReport();
         report.setDuration(duration);
         report.setTimestamp(endtime);

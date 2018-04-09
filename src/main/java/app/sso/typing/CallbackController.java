@@ -79,7 +79,7 @@ public class CallbackController {
         // 成功取得authorization code
         AuthorizationCode code = successResponse.getAuthorizationCode();
         logger.info("3. authz code grant.");
-        logger.info("code:" + code.toString());
+//        logger.info("code:" + code.toString());
         //比對state 的值是否一致
         String state = oidcClient.getState().toString();
         assert state.equals(successResponse.getState().toString());
@@ -126,8 +126,8 @@ public class CallbackController {
             RefreshToken refreshToken = (RefreshToken) accessTokenResponse.getOIDCTokens().getRefreshToken();
 
             logger.info("5 Access Token Grant.");
-            logger.info("access token value:" + accessToken.getValue());
-            logger.info("idToken value:" + idToken.getParsedString());
+//            logger.info("access token value:" + accessToken.getValue());
+//            logger.info("idToken value:" + idToken.getParsedString());
             oidcClient.setAccessToken(accessToken.getValue());
             oidcClient.setIdToken(idToken.getParsedString());
             session.setAttribute("getToken", Boolean.TRUE);

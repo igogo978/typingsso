@@ -19,28 +19,39 @@ import org.springframework.web.bind.annotation.RestController;
  * @author igogo
  */
 @RestController
-@RequestMapping("/api/tcschools/{schoolid}")
+//@RequestMapping("/api/tcschools/{schoolid}")
 public class TCSchoolsController {
 
-    @Autowired
-    SchoolRepository repository;
+    //mongo db
+//    @Autowired
+//    SchoolRepository repository;
 
+    //h2
     //    @Autowired
 //    JdbcTemplate jdbcTemplate;
 //
     private static final Logger logger = LoggerFactory.getLogger(TCSchoolsController.class);
 //    School school;
 
-    @RequestMapping(method = RequestMethod.GET)
-    public School getschoolinfo(@PathVariable String schoolid) {
 
 
-//        jdbcTemplate.query(
-//                "SELECT id, name FROM tcschools WHERE id = ?", new Object[]{schoolid},
-//                (rs, rowNum) -> new School(rs.getString("id"), rs.getString("name"))
-//        ).forEach(queryschool -> school = queryschool);
-//        logger.info(String.format("%d", schoolList.size()));
-        return repository.findBySchoolid(schoolid);
-    }
+
+
+//    @RequestMapping(method = RequestMethod.GET)
+//    public School getschoolinfo(@PathVariable String schoolid) {
+//
+//
+//
+//
+//            //jdbc query for h2
+////        jdbcTemplate.query(
+////                "SELECT id, name FROM tcschools WHERE id = ?", new Object[]{schoolid},
+////                (rs, rowNum) -> new School(rs.getString("id"), rs.getString("name"))
+////        ).forEach(queryschool -> school = queryschool);
+////        logger.info(String.format("%d", schoolList.size()));
+//
+//
+//        return repository.findBySchoolid(schoolid);
+//    }
 
 }
