@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Error</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" href="../../css/bootstrap.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <div class="navbar">
+            <div class="navbar-inner">
+                <!--				<a class="brand" href="http://www.thymeleaf.org"> Thymeleaf -
+					Plain </a>-->
+                <ul class="nav">
+                    <li><a th:href="@{/}" href="home.html"> Home </a></li>
+                    <!--<li><a th:href="@{/logout}" href="logout"> Logout </a></li>-->
+                </ul>
+            </div>
+        </div>
+        <h1 th:text="${title}">Title</h1>
+  <!--       <div id="created" th:text="${#dates.format(timestamp)}">July 11, 2012 2:17:16 PM CDT</div> -->
+        {{timestamp}}
+        <div>
+            發生了不可預期的錯誤 (type=<span th:text="${error}">Bad</span>, status=<span th:text="${status}">500</span>).
+        </div>
+        <div th:text="${message}">Fake content</div>
+        <div>
+            請聯絡維護人員
+        </div>
+    </div>
+    <footer>
+        <script>
+        Vue.prototype.$http = axios;
+        var app = new Vue({
+            el: '#app',
+            data: {
+                timestamp: ''
+            },
+            created: function() {
+                // `this` points to the vm instance
+                console.log("created");
+                let vm=this;
+                this.$http.get("api/timestamp")
+                    .then(response => {
+                        // JSON responses are automatically parsed.
+                        console.log(response.data)
+                        vm.timestamp = response.data
+                    })
+                    .catch(e => {
+                        console.log("error happened")
+                    })
+            }
+        })
+        </script>
+    </footer>
+</body>
+
+</html>
