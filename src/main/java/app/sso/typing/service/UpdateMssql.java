@@ -124,16 +124,7 @@ public class UpdateMssql {
         pstmt.setString(1, typingid);
         int result;
         rs = pstmt.executeQuery();
-//        //test description, 測試新增資料
-//        if (typingid.equals("064757-504-nFf2I")) {
-//            if (rs.next()) {
-//                logger.info(String.format("刪掉測試帳號:%s", typingid));
-//                sql = "DELETE dbo.users where userid=?";
-//                pstmt = conn.prepareStatement(sql);
-//                pstmt.setString(1, typingid);
-//                result = pstmt.executeUpdate();
-//            }
-//        }
+
         if (rs.next()) {
             logger.info("update data:" + typingid);
             sql = "UPDATE dbo.users SET pwd=?, pfrom=?, pname=?, game_year=?, kind=? where userid=?";

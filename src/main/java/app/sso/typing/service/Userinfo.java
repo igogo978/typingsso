@@ -34,7 +34,6 @@ import java.time.Instant;
 import java.util.Arrays;
 
 /**
- *
  * @author igogo
  */
 @Service
@@ -58,6 +57,9 @@ public class Userinfo {
 
     public User getUserinfo(User user, String endpoint) throws URISyntaxException, IOException, ParseException {
         BearerAccessToken accessToken = new BearerAccessToken(oidcClient.getAccessToken());
+        logger.info("oidcclient token:" + oidcClient.getAccessToken());
+
+
 //            URI userinfoEndpointURL = new URI(userinfo_endpoint);
         URI endpointURL = new URI(endpoint);
 
@@ -89,6 +91,7 @@ public class Userinfo {
 
     public User getEduinfo(User user, String endpoint) throws IOException, ParseException, URISyntaxException {
         BearerAccessToken accessToken = new BearerAccessToken(oidcClient.getAccessToken());
+
 //            URI userinfoEndpointURL = new URI(userinfo_endpoint);
         URI endpointURL = new URI(endpoint);
 
@@ -137,12 +140,13 @@ public class Userinfo {
 //            user.setClassinfo(Arrays.asList(classinfo));
 ////            user.setSchoolid(classinfo[0].getSchoolid());
 //        }
+
         return user;
     }
 
-    public User getSchoolname(User user) {
-        logger.info("Querying for school name where school id = "+user.getSchoolid());
-        logger.info(String.format("%s", user.getSchoolid()));
+    public String getSchoolname(String schoolid) {
+        logger.info("Querying for school name where school id = " + schoolid);
+//        logger.info(String.format("%s", user.getSchoolid()));
 //        jdbcTemplate.query(
 //                "SELECT id, name FROM tcschools WHERE id = ?", new Object[]{schoolid},
 //                (rs, rowNum) -> new School(rs.getString("id"), rs.getString("name"))
@@ -150,12 +154,11 @@ public class Userinfo {
 //            user.setSchoolname(school.getName());
 //        });
 
-        School school = schoolrepository.findBySchoolid(user.getSchoolid());
-        logger.info(String.format("schoolname %s", school.getName()));
+        School school = schoolrepository.findBySchoolid(schoolid);
+        logger.info(String.format("schoolname: %s", school.getName()));
 
-        user.setSchoolname(school.getName());
-
-        return user;
+//        user.setSchoolname(school.getName());
+        return school.getName();
     }
 
     public void updateUsage(User user, String typingid) {
@@ -164,13 +167,9 @@ public class Userinfo {
         long timestamp = instant.getEpochSecond();
 
 //        (String sub, String schoolid, String typingid, long timestamp)
-        Usage usage = new Usage(user.getSub(),user.getSchoolid(), typingid, timestamp);
+        Usage usage = new Usage(user.getSub(), user.getSchoolid(), typingid, timestamp);
         usagerepository.save(usage);
 
-//        //sub 是識別值
-//        // Uses JdbcTemplate's batchUpdate operation to bulk load data
-//        String sql = "INSERT INTO users(sub, typingid) VALUES(?,?) ON DUPLICATE KEY UPDATE typingid = VALUES(typingid)";
-//        jdbcTemplate.update(sql, sub, typingid);
 
     }
 }

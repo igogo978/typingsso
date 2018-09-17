@@ -28,7 +28,7 @@ public class RandomMssqlPasswd {
     public void execute(String typingid) throws InterruptedException, ClassNotFoundException, SQLException, NoSuchAlgorithmException {
 
         Thread.sleep(15000);
-        logger.info("make user's password chaos");
+        logger.info(String.format("update user %s passwd", typingid));
 
         Instant instant = Instant.now();
         long timestamp = instant.getEpochSecond();
@@ -38,7 +38,7 @@ public class RandomMssqlPasswd {
         byte[] hash = digest.digest(passwd.getBytes(StandardCharsets.UTF_8));
         String encoded = Base64.getEncoder().encodeToString(hash).substring(0, 8);
 
-        logger.info("generate an unknown passwd:" + encoded);
+        logger.info("generate an random passwd:" + encoded);
 
         String connectionUrl = "jdbc:sqlserver://163.17.39.33:1433;"
                 + "databaseName=type_db;user=game2;password=pwdpwd";
@@ -55,7 +55,6 @@ public class RandomMssqlPasswd {
 
 
         if (rs.next()) {
-            logger.info(String.format("update user %s passwd", typingid));
             sql = "UPDATE dbo.users SET pwd=? where userid=?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, encoded);  //pwd

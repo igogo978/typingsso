@@ -130,7 +130,7 @@ public class CallbackController {
 //            logger.info("idToken value:" + idToken.getParsedString());
             oidcClient.setAccessToken(accessToken.getValue());
             oidcClient.setIdToken(idToken.getParsedString());
-            session.setAttribute("getToken", Boolean.TRUE);
+//            session.setAttribute("getToken", Boolean.TRUE);
 //            session.setAttribute("accessToken", accessToken.getValue());
 //            session.setAttribute("idToken", idToken.getParsedString());
 

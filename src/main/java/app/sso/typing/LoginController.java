@@ -12,8 +12,10 @@ import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.Nonce;
+
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 /**
- *
  * @author igogo
  */
 @Controller
@@ -46,9 +47,9 @@ public class LoginController {
 
     @Value("${authorization_endpoint}")
     private String authorization_endpoint;
+    private URI oauth2callback;
 
     @RequestMapping("/typingsso/login")
-
     public RedirectView login(RedirectAttributes attributes) throws URISyntaxException {
         oidcClient.setState(new State());
         oidcClient.setNonce(new Nonce());
@@ -66,9 +67,9 @@ public class LoginController {
         );
 
         logger.info("1. User authorization request");
-//        logger.info("clientid:" + clientid);
-//        attributes.addFlashAttribute("flashAttribute", "redirectWithRedirectAttributes");
-//串在authz_endpoint後的參數
+        //logger.info("clientid:" + clientid);
+        //attributes.addFlashAttribute("flashAttribute", "redirectWithRedirectAttributes");
+        //串在authz_endpoint後的參數
         attributes.addAttribute("response_type", "code");
         attributes.addAttribute("client_id", authzReq.getClientID());
         attributes.addAttribute("redirect_uri", authzReq.getRedirectionURI());
