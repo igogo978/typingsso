@@ -15,7 +15,7 @@ import java.util.Base64;
 
 
 @Service
-public class RandomMssqlPasswd {
+public class MessingupPasswd {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -27,8 +27,8 @@ public class RandomMssqlPasswd {
     @Async
     public void execute(String typingid) throws InterruptedException, ClassNotFoundException, SQLException, NoSuchAlgorithmException {
 
-        Thread.sleep(15000);
-        logger.info(String.format("update user %s passwd", typingid));
+        Thread.sleep(10000);
+//        logger.info(String.format("update user %s passwd", typingid));
 
         Instant instant = Instant.now();
         long timestamp = instant.getEpochSecond();
@@ -81,7 +81,7 @@ public class RandomMssqlPasswd {
             logger.info(ex.getMessage());
         }
 
-        logger.info("random user's passwd ok.");
+        logger.info(String.format("messing up user %s passwd.", typingid));
 
 
     }

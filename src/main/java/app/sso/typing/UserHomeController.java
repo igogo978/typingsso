@@ -7,9 +7,8 @@ package app.sso.typing;
 
 import app.sso.typing.model.User;
 import app.sso.typing.model.user.Titles;
-import app.sso.typing.repository.UsageRepository;
 import app.sso.typing.service.OidcClient;
-import app.sso.typing.service.RandomMssqlPasswd;
+import app.sso.typing.service.MessingupPasswd;
 import app.sso.typing.service.UpdateMssql;
 import app.sso.typing.service.Userinfo;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,13 +17,10 @@ import com.nimbusds.oauth2.sdk.ParseException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +53,7 @@ public class UserHomeController {
     UpdateMssql updatemssql;
 
     @Autowired
-    RandomMssqlPasswd randompasswd;
+    MessingupPasswd messingupPasswd;
 
 
     @Value("${userinfo_endpoint}")
@@ -115,8 +111,8 @@ public class UserHomeController {
 
         }
 
-        //update login usage
-//        userinfo.updateUsage(user, typingid);
+        //update login records
+        userinfo.updateUsage(user, typingid);
 
         String base64id = Base64.getEncoder().encodeToString(typingid.getBytes());
         String base64passwd = Base64.getEncoder().encodeToString(typingpasswd.getBytes());
@@ -126,11 +122,8 @@ public class UserHomeController {
         //return new RedirectView("http://163.17.63.98/typeweb2/pwd.asp");
 
         //create a new thread for random user password
-        randompasswd.execute(typingid);
+        messingupPasswd.execute(typingid);
 
-//        if (user.getSub().equals("igogo")) {
-//            logger.info("catch igogo");
-//        }
 
 
         return new RedirectView("http://contest.tc.edu.tw/typeweb2/openidindex.asp?");
