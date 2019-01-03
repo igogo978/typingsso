@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package app.sso.typing;
+package app.sso.typing.controller;
 
 import app.sso.typing.model.User;
 import app.sso.typing.model.user.Titles;
+import app.sso.typing.repository.SysconfigRepository;
 import app.sso.typing.service.OidcClient;
 import app.sso.typing.service.MessingupPasswd;
 import app.sso.typing.service.UpdateMssql;
@@ -63,6 +64,12 @@ public class UserHomeController {
     private String eduinfo_endpoint;
 
 
+    @Autowired
+    SysconfigRepository sysconfigrepository;
+
+
+
+
     private String typingid;
     private String typingpasswd;
 
@@ -75,7 +82,7 @@ public class UserHomeController {
             return new RedirectView("/");
         }
 
-        // 考虑同时间会有多个登入, 一定每次都new 一个新的实体
+        // 考虑同时间会有多个登入, 每次一定都new 一个新的实体
         User user = new User();
         user = userinfo.getUserinfo(user, userinfo_endpoint);
         user = userinfo.getEduinfo(user, eduinfo_endpoint);
@@ -119,14 +126,15 @@ public class UserHomeController {
 
         attributes.addAttribute("userid", base64id);
         attributes.addAttribute("passwd", base64passwd);
-        //return new RedirectView("http://163.17.63.98/typeweb2/pwd.asp");
+//        logger.info("redirect url:"+ sysconfigrepository.findBySn("23952340").getUrl());
 
-        //create a new thread for random user password
+        //create a new thread waiting 10 seconds to random user's password
         messingupPasswd.execute(typingid);
 
 
 
-        return new RedirectView("http://contest.tc.edu.tw/typeweb2/openidindex.asp?");
+//        return new RedirectView("https://contest.tc.edu.tw/typeweb2/openidindex.asp?");
+        return new RedirectView(sysconfigrepository.findBySn("23952340").getUrl());
     }
 
     @RequestMapping("/typingsso/invalid")

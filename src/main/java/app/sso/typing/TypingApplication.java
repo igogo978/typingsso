@@ -1,7 +1,11 @@
 package app.sso.typing;
 
 import app.sso.typing.model.School;
+import app.sso.typing.model.Sysconfig;
 import app.sso.typing.repository.SchoolRepository;
+import app.sso.typing.repository.SysconfigRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +14,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.request.RequestContextListener;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -31,6 +35,10 @@ public class TypingApplication implements CommandLineRunner {
 
     @Autowired
     SchoolRepository repository;
+
+    @Autowired
+    SysconfigRepository sysconfigrepository;
+
 
     private static final Logger logger = LoggerFactory.getLogger(TypingApplication.class);
 
@@ -61,6 +69,31 @@ public class TypingApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
 
+        sysconfigrepository.deleteAll();
+
+        String cwd = System.getProperty("user.dir");
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node = null;
+
+        String configfile = "config.json";
+        //確認設定檔
+        if (new File(String.format("%s/%s", cwd, configfile)).isFile()) {
+
+
+            //create ObjectMapper instance
+
+            node = mapper.readTree(new File(String.format("%s/%s", cwd, configfile)));
+            String url = node.get("url").asText();
+
+            sysconfigrepository.save(new Sysconfig("23952340", url));
+
+        } else {
+            System.out.println("無設定檔");
+            System.exit(0);
+        }
+
+        logger.info(mapper.writeValueAsString(sysconfigrepository.findBySn("23952340")));
+
 
         TimeZone.setDefault(TimeZone.getTimeZone("CST"));
         logger.info("updating tcschool data");
@@ -86,13 +119,17 @@ public class TypingApplication implements CommandLineRunner {
         // Uses JdbcTemplate's batchUpdate operation to bulk load data
 //        jdbcTemplate.batchUpdate("INSERT INTO tcschools(id, name) VALUES (?,?)", splitUpNames);
 
+        //删除全部学校
+        repository.deleteAll();
+
         splitUpNames.forEach(school -> {
 //            logger.info(String.format("%s:%s",school[0].toString(),school[1].toString()));
 //            logger.info(String.valueOf(repository.countBySchoolid(school[0].toString())));
-
-            if (repository.countBySchoolid(school[0].toString()) == 0) {
-                repository.save(new School(school[0].toString(), school[1].toString()));
-            }
+            System.out.println(school[1].toString());
+            repository.save(new School(school[0].toString(), school[1].toString()));
+//            if (repository.countBySchoolid(school[0].toString()) == 0) {
+//                repository.save(new School(school[0].toString(), school[1].toString()));
+//            }
 
         });
 
