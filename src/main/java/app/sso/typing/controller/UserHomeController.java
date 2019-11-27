@@ -132,7 +132,6 @@ public class UserHomeController {
         messingupPasswd.execute(typingid);
 
 
-
 //        return new RedirectView("https://contest.tc.edu.tw/typeweb2/openidindex.asp?");
         return new RedirectView(sysconfigrepository.findBySn("23952340").getUrl());
     }

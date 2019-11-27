@@ -13,14 +13,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.request.RequestContextListener;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +71,7 @@ public class TypingApplication implements CommandLineRunner {
         sysconfigrepository.deleteAll();
 
         String cwd = System.getProperty("user.dir");
+        logger.info("cwd:" + cwd);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = null;
 
@@ -92,49 +92,74 @@ public class TypingApplication implements CommandLineRunner {
             System.exit(0);
         }
 
+
         logger.info(mapper.writeValueAsString(sysconfigrepository.findBySn("23952340")));
 
 
         TimeZone.setDefault(TimeZone.getTimeZone("CST"));
         logger.info("updating tcschool data");
 
+
+        String csvfile = String.format("%s/%s", cwd, "tcschools.csv");
+        //確認設定檔
+        if (new File(csvfile).isFile()) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(csvfile)), "UTF8"));
+            List<String> schoolList = new ArrayList<String>();
+
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                schoolList.add(line.replace("\"", ""));
+            }
+
+            List<Object[]> splits = schoolList.stream().map(school -> school.split(",")).collect(Collectors.toList());
+//             Use a Java 8 stream to print out each tuple of the list
+//            splits.forEach(name -> logger.info(String.format("TC school information for %s,%s", name[0], name[1])));
+
+            //删除全部学校
+            repository.deleteAll();
+
+
+            splits.forEach(school -> {
+                System.out.println(String.format("%s:%s", school[0].toString(), school[1].toString()));
+                repository.save(new School(school[0].toString(), school[1].toString()));
+                if (repository.countBySchoolid(school[0].toString()) == 0) {
+                    repository.save(new School(school[0].toString(), school[1].toString()));
+                }
+            });
+
+
+        } else {
+            System.out.println("無tcschools.csv档");
+            System.exit(0);
+        }
+
+        logger.info("update tc school db ok.");
+//        logger.info(repository.findBySchoolid("193525").getName());
+
+
+    }
+}
+
+
+//包在jar里的读法
+//        InputStream is = new ClassPathResource("static/csv/tcschools.csv").getInputStream();
+//        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF8"));
+//        List<String> schoolList = new ArrayList<String>();
+
+
+//jdbc写法
 //        jdbcTemplate.execute("DROP TABLE tcschools IF EXISTS");
 //        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS tcschools("
 //                + "id VARCHAR(100), name VARCHAR(100))");
 
 //        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS users("
 //                + "sub VARCHAR(100) PRIMARY KEY, typingid VARCHAR(100))");
-        InputStream is = new ClassPathResource("static/csv/tcschools.csv").getInputStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF8"));
-        List<String> schoolList = new ArrayList<String>();
 
-        String line;
-        while ((line = br.readLine()) != null) {
-            schoolList.add(line);
-        }
-        List<Object[]> splitUpNames = schoolList.stream().map(school -> school.split(",")).collect(Collectors.toList());
-        // Use a Java 8 stream to print out each tuple of the list
-        //splitUpNames.forEach(name -> logger.info(String.format("Inserting customer record for %s %s", name[0], name[1])));
 
-        // Uses JdbcTemplate's batchUpdate operation to bulk load data
+// Uses JdbcTemplate's batchUpdate operation to bulk load data
 //        jdbcTemplate.batchUpdate("INSERT INTO tcschools(id, name) VALUES (?,?)", splitUpNames);
 
-        //删除全部学校
-        repository.deleteAll();
-
-        splitUpNames.forEach(school -> {
-//            logger.info(String.format("%s:%s",school[0].toString(),school[1].toString()));
-//            logger.info(String.valueOf(repository.countBySchoolid(school[0].toString())));
-            System.out.println(school[1].toString());
-            repository.save(new School(school[0].toString(), school[1].toString()));
-//            if (repository.countBySchoolid(school[0].toString()) == 0) {
-//                repository.save(new School(school[0].toString(), school[1].toString()));
-//            }
-
-        });
-
-        logger.info("update tc school db ok.");
-//        logger.info(repository.findBySchoolid("064609").getName());
 
 //        logger.info("Querying for customer records where id = '064757':");
 //
@@ -143,6 +168,3 @@ public class TypingApplication implements CommandLineRunner {
 //                (rs, rowNum) -> new School(rs.getString("id"), rs.getString("name"))
 //        ).forEach(school -> logger.info(school.getName()));
 //        logger.info(String.format("%d", schoolList.size()));
-
-    }
-}

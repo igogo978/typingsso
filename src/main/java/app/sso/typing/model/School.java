@@ -8,13 +8,12 @@ package app.sso.typing.model;
 import org.springframework.data.annotation.Id;
 
 /**
- *
  * @author igogo
  */
 public class School {
 
+    //    private String id;
     @Id
-    private String id;
     private String schoolid;
     private String name;
 

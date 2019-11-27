@@ -47,7 +47,7 @@ public class Userinfo {
     OidcClient oidcClient;
 
     @Autowired
-    SchoolRepository schoolrepository;
+    SchoolRepository schoolRepository;
 
     @Autowired
     UsageRepository usagerepository;
@@ -145,20 +145,19 @@ public class Userinfo {
     }
 
     public String getSchoolname(String schoolid) {
-        logger.info("Querying for school name where school id = " + schoolid);
-//        logger.info(String.format("%s", user.getSchoolid()));
-//        jdbcTemplate.query(
-//                "SELECT id, name FROM tcschools WHERE id = ?", new Object[]{schoolid},
-//                (rs, rowNum) -> new School(rs.getString("id"), rs.getString("name"))
-//        ).forEach(school -> {
-//            user.setSchoolname(school.getName());
-//        });
+//        logger.info("Querying for school name where school id = " + schoolid);
+        School school = new School();
 
-        School school = schoolrepository.findBySchoolid(schoolid);
-        logger.info(String.format("schoolname: %s", school.getName()));
+        if (schoolRepository.countBySchoolid(schoolid) != 0) {
+            school = schoolRepository.findBySchoolid(schoolid);
+            logger.info(String.format("schoolname: %s", school.getName()));
+            return school.getName();
+        } else {
+            logger.info(schoolid);
+            return schoolid;
+        }
 
-//        user.setSchoolname(school.getName());
-        return school.getName();
+
     }
 
     public void updateUsage(User user, String typingid) {
@@ -173,3 +172,13 @@ public class Userinfo {
 
     }
 }
+
+
+//jdbc query example
+//        logger.info(String.format("%s", user.getSchoolid()));
+//        jdbcTemplate.query(
+//                "SELECT id, name FROM tcschools WHERE id = ?", new Object[]{schoolid},
+//                (rs, rowNum) -> new School(rs.getString("id"), rs.getString("name"))
+//        ).forEach(school -> {
+//            user.setSchoolname(school.getName());
+//        });
