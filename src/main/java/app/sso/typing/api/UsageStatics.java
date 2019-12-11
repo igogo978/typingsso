@@ -42,16 +42,16 @@ public class UsageStatics {
     @RequestMapping(value = "/hours", method = RequestMethod.GET)
     public List<UsageReport> byHours(HttpServletResponse response) throws IOException {
         ArrayList<UsageReport> reports = new ArrayList<>();
-        if (!StringUtils.hasText(oidcClient.getAccessToken())) {
-//            沒有登入,返回登入首頁
-            logger.info("未取得access token");
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(URI.create("/"));
-
-            response.sendRedirect("/");
-
-        }
+//        if (!StringUtils.hasText(oidcClient.getAccessToken())) {
+////            沒有登入,返回登入首頁
+//            logger.info("未取得access token");
+//
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setLocation(URI.create("/"));
+//
+//            response.sendRedirect("/");
+//
+//        }
 
 
         long duration;
@@ -77,16 +77,16 @@ public class UsageStatics {
     @RequestMapping(value = "/days", method = RequestMethod.GET)
     public List<UsageReport> byDays(HttpServletResponse response) throws IOException {
 
-        if (!StringUtils.hasText(oidcClient.getAccessToken())) {
-//            沒有登入,返回登入首頁
-            logger.info("未取得access token");
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(URI.create("/"));
-
-            response.sendRedirect("/");
-
-        }
+//        if (!StringUtils.hasText(oidcClient.getAccessToken())) {
+////            沒有登入,返回登入首頁
+//            logger.info("未取得access token");
+//
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setLocation(URI.create("/"));
+//
+//            response.sendRedirect("/");
+//
+//        }
 
 
         List<UsageReport> reports = new ArrayList<>();

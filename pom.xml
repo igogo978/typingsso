@@ -4,8 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>app.sso</groupId>
-    <artifactId>typing</artifactId>
-    <version>0.8</version>
+    <artifactId>typingsso</artifactId>
+    <version>1.2</version>
     <packaging>jar</packaging>
 
     <name>typingSSO</name>
@@ -34,6 +34,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
         <dependency>
