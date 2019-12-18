@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Random;
 
 
 @Service
@@ -26,8 +27,10 @@ public class MessingupPasswd {
 
     @Async
     public void execute(String typingid) throws InterruptedException, ClassNotFoundException, SQLException, NoSuchAlgorithmException {
-
-        Thread.sleep(10000);
+        Random random = new Random();
+        Integer waitingSeconds = random.ints(10000,30000).findFirst().getAsInt();
+        logger.info("waiting seconds to mess up user's password: "+String.valueOf(waitingSeconds));
+        Thread.sleep(waitingSeconds);
 //        logger.info(String.format("update user %s passwd", typingid));
 
         Instant instant = Instant.now();

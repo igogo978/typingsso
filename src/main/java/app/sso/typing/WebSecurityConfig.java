@@ -14,7 +14,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .headers()
-                .contentSecurityPolicy("script-src 'self' https://maxcdn.bootstrapcdn.com/bootstrap/ https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js");
+                .contentSecurityPolicy("default-src 'self' https://maxcdn.bootstrapcdn.com/bootstrap/ https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js");
 
 
     }

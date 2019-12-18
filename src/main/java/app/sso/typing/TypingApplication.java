@@ -96,9 +96,10 @@ public class TypingApplication implements CommandLineRunner {
         logger.info(mapper.writeValueAsString(sysconfigrepository.findBySn("23952340")));
 
 
-        TimeZone.setDefault(TimeZone.getTimeZone("CST"));
+//        TimeZone.setDefault(TimeZone.getTimeZone("CST"));
         logger.info("updating tcschool data");
 
+        System.out.println("now time: " + java.time.LocalDateTime.now());
 
         String csvfile = String.format("%s/%s", cwd, "tcschools.csv");
         //確認設定檔

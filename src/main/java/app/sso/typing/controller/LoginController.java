@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package app.sso.typing;
+package app.sso.typing.controller;
 
 import app.sso.typing.service.OidcClient;
 import com.nimbusds.oauth2.sdk.ResponseType;

@@ -43,8 +43,8 @@ public class Userinfo {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode root;
 
-    @Autowired
-    OidcClient oidcClient;
+//    @Autowired
+//    OidcClient oidcClient;
 
     @Autowired
     SchoolRepository schoolRepository;
@@ -55,11 +55,11 @@ public class Userinfo {
 //    @Autowired
 //    JdbcTemplate jdbcTemplate;
 
-    public User getUserinfo(User user, String endpoint) throws URISyntaxException, IOException, ParseException {
-        BearerAccessToken accessToken = new BearerAccessToken(oidcClient.getAccessToken());
-        logger.info("oidcclient token:" + oidcClient.getAccessToken());
 
+    public User getUserinfo(User user, String userAccessToken, String endpoint) throws URISyntaxException, IOException, ParseException {
+        BearerAccessToken accessToken = new BearerAccessToken(userAccessToken);
 
+//        logger.info("oidcclient token:" + oidcClient.getAccessToken());
 //            URI userinfoEndpointURL = new URI(userinfo_endpoint);
         URI endpointURL = new URI(endpoint);
 
@@ -67,7 +67,7 @@ public class Userinfo {
         UserInfoRequest userInfoReq = new UserInfoRequest(endpointURL, accessToken);
 
         //觀察送出的header
-        logger.info("userinfo request header:" + userInfoReq.toHTTPRequest().getHeaders().toString());
+//        logger.info("userinfo request header:" + userInfoReq.toHTTPRequest().getHeaders().toString());
 //            curl -X POST -H "Authorization:Bearer accesstoken" "https://tc.sso.edu.tw/oidc/v1/userinfo"
 
         HTTPResponse userInfoHTTPResponse = userInfoReq.toHTTPRequest().send();
@@ -83,14 +83,55 @@ public class Userinfo {
         UserInfoSuccessResponse successUserInfoResponse = (UserInfoSuccessResponse) userInfoResponse;
         String userinfo = successUserInfoResponse.getUserInfo().toJSONObject().toString();
         root = mapper.readTree(userinfo);
-        logger.info("user name:" + root.get("name").asText());
+
         user.setUsername(root.get("name").asText());
 
+        logger.info("user name:" + root.get("name").asText());
+        logger.info(String.format("userinfo:%s,%s",user.getUsername(),userAccessToken));
         return user;
     }
 
-    public User getEduinfo(User user, String endpoint) throws IOException, ParseException, URISyntaxException {
-        BearerAccessToken accessToken = new BearerAccessToken(oidcClient.getAccessToken());
+
+
+
+//    public User getUserinfo(User user, String endpoint) throws URISyntaxException, IOException, ParseException {
+//        BearerAccessToken accessToken = new BearerAccessToken(oidcClient.getAccessToken());
+//
+////        logger.info("oidcclient token:" + oidcClient.getAccessToken());
+////            URI userinfoEndpointURL = new URI(userinfo_endpoint);
+//        URI endpointURL = new URI(endpoint);
+//
+//        // Append the access token to form actual request
+//        UserInfoRequest userInfoReq = new UserInfoRequest(endpointURL, accessToken);
+//
+//        //觀察送出的header
+////        logger.info("userinfo request header:" + userInfoReq.toHTTPRequest().getHeaders().toString());
+////            curl -X POST -H "Authorization:Bearer accesstoken" "https://tc.sso.edu.tw/oidc/v1/userinfo"
+//
+//        HTTPResponse userInfoHTTPResponse = userInfoReq.toHTTPRequest().send();
+//
+////            UserInfoResponse userInfoResponse = null;
+//        UserInfoResponse userInfoResponse = UserInfoResponse.parse(userInfoHTTPResponse);
+//
+//        if (userInfoResponse instanceof UserInfoErrorResponse) {
+//            ErrorObject error = ((UserInfoErrorResponse) userInfoResponse).getErrorObject();
+//            // TODO error handling
+//        }
+//
+//        UserInfoSuccessResponse successUserInfoResponse = (UserInfoSuccessResponse) userInfoResponse;
+//        String userinfo = successUserInfoResponse.getUserInfo().toJSONObject().toString();
+//        root = mapper.readTree(userinfo);
+//
+//        logger.info("user name:" + root.get("name").asText());
+//
+//        user.setUsername(root.get("name").asText());
+//
+//        return user;
+//    }
+
+
+    public User getEduinfo(User user, String userAccessToken, String endpoint) throws IOException, ParseException, URISyntaxException {
+        BearerAccessToken accessToken = new BearerAccessToken(userAccessToken);
 
 //            URI userinfoEndpointURL = new URI(userinfo_endpoint);
         URI endpointURL = new URI(endpoint);
@@ -113,7 +154,7 @@ public class Userinfo {
 
         UserInfoSuccessResponse successUserInfoResponse = (UserInfoSuccessResponse) userInfoResponse;
         String userinfo = successUserInfoResponse.getUserInfo().toJSONObject().toString();
-        logger.info("eduinfo:" + userinfo);
+//        logger.info("eduinfo:" + userinfo);
 
 //        {"sub":"096031996","classinfo":[{"year":null,"classtitle":"五年丁班","schoolid":"064757","grade":"5","classno":"04","semester":null}],"titles":[{"schoolid":"064757","titles":["學生"]}],"schoolid":"064757"}
         user.setSub(mapper.readTree(userinfo).get("sub").asText());
@@ -134,6 +175,59 @@ public class Userinfo {
 
         }
 
+        return user;
+    }
+
+
+
+
+//
+//
+//    public User getEduinfo(User user, String endpoint) throws IOException, ParseException, URISyntaxException {
+//        BearerAccessToken accessToken = new BearerAccessToken(oidcClient.getAccessToken());
+//
+////            URI userinfoEndpointURL = new URI(userinfo_endpoint);
+//        URI endpointURL = new URI(endpoint);
+//
+//        // Append the access token to form actual request
+//        UserInfoRequest userInfoReq = new UserInfoRequest(endpointURL, accessToken);
+//
+//        //觀察送出的header
+////        logger.info("userinfo request header:" + userInfoReq.toHTTPRequest().getHeaders().toString());
+////            curl -X POST -H "Authorization:Bearer accesstoken" "https://tc.sso.edu.tw/oidc/v1/userinfo"
+//        HTTPResponse userInfoHTTPResponse = userInfoReq.toHTTPRequest().send();
+//
+////            UserInfoResponse userInfoResponse = null;
+//        UserInfoResponse userInfoResponse = UserInfoResponse.parse(userInfoHTTPResponse);
+//
+//        if (userInfoResponse instanceof UserInfoErrorResponse) {
+//            ErrorObject error = ((UserInfoErrorResponse) userInfoResponse).getErrorObject();
+//            // TODO error handling
+//        }
+//
+//        UserInfoSuccessResponse successUserInfoResponse = (UserInfoSuccessResponse) userInfoResponse;
+//        String userinfo = successUserInfoResponse.getUserInfo().toJSONObject().toString();
+//        logger.info("eduinfo:" + userinfo);
+//
+////        {"sub":"096031996","classinfo":[{"year":null,"classtitle":"五年丁班","schoolid":"064757","grade":"5","classno":"04","semester":null}],"titles":[{"schoolid":"064757","titles":["學生"]}],"schoolid":"064757"}
+//        user.setSub(mapper.readTree(userinfo).get("sub").asText());
+//        user.setSchoolid(mapper.readTree(userinfo).get("schoolid").asText());
+//        root = mapper.readTree(userinfo).get("titles");
+//
+//        Titles[] titles = mapper.treeToValue(root, Titles[].class);
+//        user.setTitles(Arrays.asList(titles));
+//        root = mapper.readTree(userinfo).get("classinfo");
+//
+//        for (Titles title : titles) {
+//            Boolean id = title.getTitles().stream().anyMatch(name -> name.matches("學生"));
+//
+//            if (id) {
+//                Classinfo[] classinfo = mapper.treeToValue(root, Classinfo[].class);
+//                user.setClassinfo(Arrays.asList(classinfo));
+//            }
+//
+//        }
+
 //        if (titles[0].getTitles().get(0).equals("學生")) {
 //            //身份別為學生才能取得班級資訊
 //            Classinfo[] classinfo = mapper.treeToValue(root, Classinfo[].class);
@@ -141,8 +235,8 @@ public class Userinfo {
 ////            user.setSchoolid(classinfo[0].getSchoolid());
 //        }
 
-        return user;
-    }
+//        return user;
+//    }
 
     public String getSchoolname(String schoolid) {
 //        logger.info("Querying for school name where school id = " + schoolid);
@@ -161,7 +255,7 @@ public class Userinfo {
     }
 
     public void updateUsage(User user, String typingid) {
-        logger.info(("login record insert into db"));
+        logger.info(("login record insert into usage db"));
         Instant instant = Instant.now();
         long timestamp = instant.getEpochSecond();
 

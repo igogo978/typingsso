@@ -37,6 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -66,8 +69,11 @@ public class CallbackController {
     private String token_endpoint;
 
     @RequestMapping("/typingsso/callback")
-    public void callback(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws URISyntaxException, ParseException, IOException, InterruptedException {
+    public ResponseEntity<Object> callback(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws URISyntaxException, ParseException, IOException, InterruptedException {
 //https://type.wtps.tc.edu.tw/typingsso/callback?state=cIyvCscGfuXjvscILbkKs7LQG_uTMb3A4KyEk6rXL-U&code=4%2FAAB4AwrNKr8GoGGAc_GYCxocY7IG8ptkGcKycRxiDUcVKT1uXDP7DuO6AIVbbDsv-_Ad39BkjuwY48LCWqtpHOk&authuser=0&hd=tc.edu.tw&session_state=fe3c6696b362d3b26776de50d28392176878e301..be69&prompt=consent#
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/"));
+
         String queryString = request.getQueryString();
         String responseURL = "https://path/?" + queryString;
         AuthenticationResponse authResponse = AuthenticationResponseParser.parse(new URI(responseURL));
@@ -134,7 +140,11 @@ public class CallbackController {
 
         }
 
-        response.sendRedirect("/typingsso/userhome");
+        headers.setLocation(URI.create("/typingsso/userhome"));
+
+//        response.sendRedirect("/typingsso/userhome");
+        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+
     }
 
 }

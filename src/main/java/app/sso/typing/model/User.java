@@ -7,11 +7,11 @@ package app.sso.typing.model;
 
 import app.sso.typing.model.user.Classinfo;
 import app.sso.typing.model.user.Titles;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author igogo
  */
 public class User {
@@ -22,6 +22,7 @@ public class User {
     private List<Titles> titles = new ArrayList<Titles>();
     private String schoolname = "";
     private String sub = "";
+    private String accesstoken = "";
 
     public String getSub() {
         return sub;
@@ -72,4 +73,11 @@ public class User {
         this.titles = titles;
     }
 
+    public String getAccesstoken() {
+        return accesstoken;
+    }
+
+    public void setAccesstoken(String accesstoken) {
+        this.accesstoken = accesstoken;
+    }
 }
