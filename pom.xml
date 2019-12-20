@@ -5,7 +5,7 @@
 
     <groupId>app.sso</groupId>
     <artifactId>typingsso</artifactId>
-    <version>2.7</version>
+    <version>3.5</version>
     <packaging>jar</packaging>
 
     <name>typingSSO</name>

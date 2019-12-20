@@ -105,7 +105,7 @@ public class UserHomeController {
                 typingid = setStudTypingID(user);
                 //064757-504-sub value
                 //更新學生mssql 資料
-                updatemssql.updateStudMssql(typingid, typingpasswd, user);
+                updatemssql.updateStudentMssql(typingid, typingpasswd, user);
 
             } else {
 //            logger.info("不具學生身份");   //sub值為帳號,ex: igogo

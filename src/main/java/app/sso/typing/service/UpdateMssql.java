@@ -6,6 +6,8 @@
 package app.sso.typing.service;
 
 import app.sso.typing.model.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,38 +22,68 @@ import java.util.stream.Collectors;
 @Service
 public class UpdateMssql {
 
-    // Declare the JDBC objects.  
-    Connection conn;
-    PreparedStatement pstmt;
-    ResultSet rs;
 
     private final Logger logger = LoggerFactory.getLogger(UpdateMssql.class);
+    ObjectMapper mapper = new ObjectMapper();
 
-    public void updateStudMssql(String userid, String userpasswd, User user) throws ClassNotFoundException, SQLException {
-        int year = Calendar.getInstance().get(Calendar.YEAR);
+    int year = Calendar.getInstance().get(Calendar.YEAR);
+    String connectionUrl = "jdbc:sqlserver://163.17.39.33:1433;"
+            + "databaseName=type_db;user=game2;password=pwdpwd";
 
-        logger.info("connect mssql");
-//        String connectionUrl = "jdbc:sqlserver://163.17.63.98:1433;"
-        String connectionUrl = "jdbc:sqlserver://163.17.39.33:1433;"
-                + "databaseName=type_db;user=game2;password=pwdpwd";
-
-        String sql;
+    public boolean isUserExist(String userid) throws ClassNotFoundException {
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        conn = DriverManager.getConnection(connectionUrl);
+        String sql = "SELECT COUNT(*) FROM dbo.users where userid=?";
+
+        try (Connection conn = DriverManager.getConnection(connectionUrl);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setString(1, userid);
+            try (ResultSet rs = pstmt.executeQuery();) {
+                rs.next();
+//                logger.info("count for user:" + String.valueOf(rs.getInt(1)));
+
+                if (rs.getInt(1) == 0) {
+                    return false;
+                }
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return true;
+    }
 
 
-        //判断是否已有user记录
-        sql = "SELECT * FROM dbo.users where userid=?";
-        pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, userid);
-        int result;
-        rs = pstmt.executeQuery();
+    public void updateStudentMssql(String userid, String userpasswd, User user) throws ClassNotFoundException, SQLException, JsonProcessingException {
+
+//        if (userid.equals("064643-601-096100766")) {
+//            deleteUser(userid);
+//        }
+
+        if (isUserExist(userid)) {
+            updateStudent(userid, userpasswd, user);
+
+        } else {
+            addStudent(userid, userpasswd, user);
+        }
 
 
-        if (rs.next()) {
-            logger.info(String.format("UPDATE data: %s,%s", user.getUsername(), userid));
-            sql = "UPDATE dbo.users SET pwd=?, pfrom=?, pname=?, game_year=?, kind=?, pgrade=?, pclassno=? where userid=?";
-            pstmt = conn.prepareStatement(sql);
+    }
+
+    private void updateStudent(String userid, String userpasswd, User user) throws ClassNotFoundException, JsonProcessingException {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        logger.info(String.format("UPDATE data: %s,%s", user.getUsername(), userid));
+        String sql = "UPDATE dbo.users SET pwd=?, pfrom=?, pname=?, game_year=?, kind=?, pgrade=?, pclassno=? where userid=?";
+
+
+        try (Connection conn = DriverManager.getConnection(connectionUrl);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+
             pstmt.setString(1, userpasswd);  //pwd
             pstmt.setString(2, user.getSchoolname());  //pfrom
             pstmt.setString(3, user.getUsername()); //pname
@@ -62,13 +94,38 @@ public class UpdateMssql {
             pstmt.setString(7, user.getClassinfo().get(0).getClassno()); //pclassno
             pstmt.setString(8, userid);
 
-            result = pstmt.executeUpdate();
 
-        } else {
+            try {
+
+                Integer rs = pstmt.executeUpdate();
+                logger.info("UPDATE USER AND RETUREN VALUE: " + mapper.writeValueAsString(rs));
+
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            } finally {
+                pstmt.close();
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+
+    }
+
+
+    private void addStudent(String userid, String userpasswd, User user) throws ClassNotFoundException, JsonProcessingException {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+//        logger.info(String.format("UPDATE Student data: %s,%s", user.getUsername(), userid));
+        String sql = "INSERT INTO dbo.users (userid, pwd, pfrom, pname, game_year, pgrade, pclassno, kind) VALUES(?,?,?,?,?,?,?,?)";
+
+        try (Connection conn = DriverManager.getConnection(connectionUrl);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+
             logger.info(String.format("ADD data: %s,%s", user.getUsername(), userid));
 
-            sql = "INSERT INTO dbo.users (userid, pwd, pfrom, pname, game_year, pgrade, pclassno, kind) VALUES(?,?,?,?,?,?,?,?)";
-            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, userid);
             pstmt.setString(2, userpasswd);
             pstmt.setString(3, user.getSchoolname());
@@ -77,19 +134,131 @@ public class UpdateMssql {
             pstmt.setString(6, user.getClassinfo().get(0).getGrade()); //pgrade
             pstmt.setString(7, user.getClassinfo().get(0).getClassno()); //pclassno
             pstmt.setString(8, "p");
-            result = pstmt.executeUpdate();
+
+
+            try {
+
+                Integer rs = pstmt.executeUpdate();
+                logger.info("INSERT INTO DB AND RETUREN VALUE: " + mapper.writeValueAsString(rs));
+
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            } finally {
+                pstmt.close();
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
 
-        try {
-            conn.close();
-        } catch (SQLException ex) {
-//            ex.printStackTrace();
-            logger.info(ex.getMessage());
-        }
+
     }
 
-    public void updateTeacherMssql(String userid, String userpasswd, User user) throws ClassNotFoundException, SQLException {
-        int year = Calendar.getInstance().get(Calendar.YEAR);
+
+    private void updateTeacher(String userid, String userpasswd, User user) throws ClassNotFoundException, JsonProcessingException {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
+        String userTitles = user.getTitles().stream()
+                .flatMap(titles -> titles.getTitles().stream())
+                .collect(Collectors.joining("-"));
+
+
+        String pfrom = String.format("%s-%s", user.getSchoolname(), userTitles);
+        String sql = "UPDATE dbo.users SET pwd=?, pfrom=?, pname=?, game_year=?, kind=? where userid=?";
+
+        try (Connection conn = DriverManager.getConnection(connectionUrl);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+
+            pstmt.setString(1, userpasswd);  //pwd
+            pstmt.setString(2, pfrom);  //pfrom
+            pstmt.setString(3, user.getUsername()); //pname
+            pstmt.setString(4, String.format("%d", year));  //game_year
+
+            pstmt.setString(5, "p"); //表示練習組 kind
+            pstmt.setString(6, userid);
+
+
+            try {
+
+                Integer rs = pstmt.executeUpdate();
+                logger.info("UPDATE DB AND RETUREN VALUE: " + mapper.writeValueAsString(rs));
+
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            } finally {
+                pstmt.close();
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+
+    }
+
+
+    private void addTeacher(String userid, String userpasswd, User user) throws ClassNotFoundException, JsonProcessingException {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        logger.info(String.format("ADD data: %s,%s", user.getUsername(), userid));
+
+        String sql = "INSERT INTO dbo.users (userid, pwd, pfrom, pname, game_year, kind) VALUES(?,?,?,?,?,?)";
+
+
+        String userTitles = user.getTitles().stream()
+                .flatMap(titles -> titles.getTitles().stream())
+                .collect(Collectors.joining("-"));
+
+
+        String pfrom = String.format("%s-%s", user.getSchoolname(), userTitles);
+
+        try (Connection conn = DriverManager.getConnection(connectionUrl);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+
+
+            pstmt.setString(1, userid);
+            pstmt.setString(2, userpasswd);
+            pstmt.setString(3, pfrom);
+            pstmt.setString(4, user.getUsername());
+            pstmt.setString(5, String.format("%d", year));
+            pstmt.setString(6, "p");
+
+            try {
+
+                Integer rs = pstmt.executeUpdate();
+                logger.info("INSERT INTO DB AND RETUREN VALUE: " + mapper.writeValueAsString(rs));
+
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            } finally {
+                pstmt.close();
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+
+    }
+
+
+    public void updateTeacherMssql(String userid, String userpasswd, User user) throws ClassNotFoundException, SQLException, JsonProcessingException {
+
+//        if (userid.equals("igogo")) {
+//            deleteUser(userid);
+//
+//        }
+
+        // Declare the JDBC objects.
+        Connection conn;
+        PreparedStatement pstmt;
+        ResultSet rs;
+
+//        int year = Calendar.getInstance().get(Calendar.YEAR);
 
         String userTitles = user.getTitles().stream()
                 .flatMap(titles -> titles.getTitles().stream())
@@ -112,34 +281,15 @@ public class UpdateMssql {
         int result;
         rs = pstmt.executeQuery();
 
-        if (rs.next()) {
-            logger.info(String.format("UPDATE data: %s,%s", user.getUsername(), userid));
-            sql = "UPDATE dbo.users SET pwd=?, pfrom=?, pname=?, game_year=?, kind=? where userid=?";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, userpasswd);  //pwd
-            pstmt.setString(2, pfrom);  //pfrom
-            pstmt.setString(3, user.getUsername()); //pname
-            pstmt.setString(4, String.format("%d", year));  //game_year
+        if (isUserExist(userid)) {
+            updateTeacher(userid, userpasswd, user);
 
-            pstmt.setString(5, "p"); //表示練習組 kind
-            pstmt.setString(6, userid);
-
-            result = pstmt.executeUpdate();
 
         } else {
-            logger.info(String.format("ADD data: %s,%s", user.getUsername(), userid));
+            addTeacher(userid, userpasswd, user);
 
-            sql = "INSERT INTO dbo.users (userid, pwd, pfrom, pname, game_year, kind) VALUES(?,?,?,?,?,?)";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, userid);
-            pstmt.setString(2, userpasswd);
-            pstmt.setString(3, pfrom);
-            pstmt.setString(4, user.getUsername());
-            pstmt.setString(5, String.format("%d", year));
-
-            pstmt.setString(6, "p");
-            result = pstmt.executeUpdate();
         }
+
 
         try {
             conn.close();
@@ -149,16 +299,39 @@ public class UpdateMssql {
         }
     }
 
+
+    private void deleteUser(String userid) throws ClassNotFoundException, JsonProcessingException {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        logger.info(String.format("DELETE USER: %s", userid));
+
+        String sql = "DELETE dbo.users where userid=?";
+
+
+        try (Connection conn = DriverManager.getConnection(connectionUrl);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+
+            pstmt.setString(1, userid);
+
+            try {
+
+                Integer rs = pstmt.executeUpdate();
+                logger.info("DELETE USER AND RERUTN VALUES: " + mapper.writeValueAsString(rs));
+
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            } finally {
+                pstmt.close();
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
 }
 
 
-//        //test description, 測試新增資料
-//        if (typingid.equals("064757-504-nFf2I")) {
-//            if (rs.next()) {
-//                logger.info(String.format("刪掉測試帳號:%s", typingid));
-//                sql = "DELETE dbo.users where userid=?";
-//                pstmt = conn.prepareStatement(sql);
-//                pstmt.setString(1, typingid);
-//                result = pstmt.executeUpdate();
-//            }
-//        }
+
