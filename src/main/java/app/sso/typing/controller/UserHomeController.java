@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 
@@ -83,7 +84,7 @@ public class UserHomeController {
             user.setUsername("");
 
 
-            user.setAccesstoken(oidcClient.getAccessToken()) ;
+            user.setAccesstoken(oidcClient.getAccessToken());
 
 
             user = userinfo.getUserinfo(user, user.getAccesstoken(), userinfo_endpoint);
@@ -118,22 +119,24 @@ public class UserHomeController {
             //update login records
             userinfo.updateUsage(user, typingid);
 
-            String base64id = Base64.getEncoder().encodeToString(typingid.getBytes());
+            String base64userid = Base64.getEncoder().encodeToString(typingid.getBytes());
             String base64passwd = Base64.getEncoder().encodeToString(typingpasswd.getBytes());
 
-            attributes.addAttribute("userid", base64id);
+            attributes.addAttribute("userid", base64userid);
             attributes.addAttribute("passwd", base64passwd);
 //        logger.info("redirect url:"+ sysconfigrepository.findBySn("23952340").getUrl());
+            Instant instant = Instant.now();
+            long timestamp = instant.getEpochSecond();
 
+            String randomPasswd = String.format("%s%s", user.getAccesstoken().substring(0, 4), String.valueOf(timestamp).substring(0, 4));
             //create a new thread waiting 10 seconds to random user's password
-            messingupPasswd.execute(typingid);
+            messingupPasswd.execute(typingid, randomPasswd);
 
-
+            //return new RedirectView("https://contest.tc.edu.tw/typeweb2/openidindex.asp?");
+            return new RedirectView(sysconfigrepository.findBySn("23952340").getUrl());
         }
 
 
-//        return new RedirectView("https://contest.tc.edu.tw/typeweb2/openidindex.asp?");
-        return new RedirectView(sysconfigrepository.findBySn("23952340").getUrl());
     }
 
     @RequestMapping("/typingsso/invalid")

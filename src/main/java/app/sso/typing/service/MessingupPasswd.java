@@ -7,10 +7,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
-import java.time.Instant;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Base64;
 import java.util.Random;
 
@@ -21,51 +22,57 @@ public class MessingupPasswd {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // Declare the JDBC objects.
-    Connection conn;
-    PreparedStatement pstmt;
-    ResultSet rs;
+//    Connection conn;
+//    PreparedStatement pstmt;
+//    ResultSet rs;
 
     @Async
-    public void execute(String typingid) throws InterruptedException, ClassNotFoundException, SQLException, NoSuchAlgorithmException {
+    public void execute(String typingid, String passwd) throws InterruptedException, ClassNotFoundException, SQLException, NoSuchAlgorithmException {
         Random random = new Random();
-        Integer waitingSeconds = random.ints(10000,30000).findFirst().getAsInt();
-        logger.info("waiting seconds to mess up user's password: "+String.valueOf(waitingSeconds));
+        Integer waitingSeconds = random.ints(10000, 20000).findFirst().getAsInt();
+        logger.info("waiting seconds to mess up user's password: " + String.valueOf(waitingSeconds / 1000));
         Thread.sleep(waitingSeconds);
 //        logger.info(String.format("update user %s passwd", typingid));
 
-        Instant instant = Instant.now();
-        long timestamp = instant.getEpochSecond();
+//        Instant instant = Instant.now();
+//        long timestamp = instant.getEpochSecond();
 
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        String passwd = String.valueOf(timestamp);
-        byte[] hash = digest.digest(passwd.getBytes(StandardCharsets.UTF_8));
-        String encoded = Base64.getEncoder().encodeToString(hash).substring(0, 8);
 
-        logger.info("generate an random passwd:" + encoded);
+//        String passwd = String.format("%s", Base64.getEncoder().encodeToString(String.valueOf(waitingSeconds).getBytes(StandardCharsets.UTF_8)).substring(0, 8));
+//
+        logger.info("GENERATE an random passwd:" + passwd);
 
         String connectionUrl = "jdbc:sqlserver://163.17.39.33:1433;"
                 + "databaseName=type_db;user=game2;password=pwdpwd";
-        String sql;
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        conn = DriverManager.getConnection(connectionUrl);
+//        conn = DriverManager.getConnection(connectionUrl);
 
 
-        sql = "SELECT * FROM dbo.users where userid=?";
-        pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, typingid);
-        int result;
-        rs = pstmt.executeQuery();
+        String sql = "UPDATE dbo.users SET pwd=? where userid=?";
+        try (Connection conn = DriverManager.getConnection(connectionUrl);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+
+            pstmt.setString(1, passwd);  //pwd
+            pstmt.setString(2, typingid);  //pfrom
 
 
-        if (rs.next()) {
-            sql = "UPDATE dbo.users SET pwd=? where userid=?";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, encoded);  //pwd
-            pstmt.setString(2, typingid);  //typingid
+            try {
 
-            result = pstmt.executeUpdate();
+                Integer rs = pstmt.executeUpdate();
+                logger.info(String.format("MESSING UP USER %s PASSWD AND RETURN VALUES: %s", typingid, rs));
 
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            } finally {
+                pstmt.close();
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
+
 
         //validate passwd
 //        sql = "SELECT * FROM dbo.users where userid=?";
@@ -76,15 +83,13 @@ public class MessingupPasswd {
 //            logger.info("query update passwd value:" + rs.getString("pwd"));
 //        }
 
-        try {
-            pstmt.close();
-            conn.close();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            logger.info(ex.getMessage());
-        }
-
-        logger.info(String.format("messing up user %s passwd.", typingid));
+//        try {
+//            pstmt.close();
+//            conn.close();
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//            logger.info(ex.getMessage());
+//        }
 
 
     }

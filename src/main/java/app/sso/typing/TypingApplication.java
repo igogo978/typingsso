@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
@@ -136,6 +135,8 @@ public class TypingApplication implements CommandLineRunner {
         }
 
         logger.info("update tc school db ok.");
+
+
 //        logger.info(repository.findBySchoolid("193525").getName());
 
 
