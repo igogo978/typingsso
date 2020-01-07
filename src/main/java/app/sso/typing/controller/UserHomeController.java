@@ -8,10 +8,8 @@ package app.sso.typing.controller;
 import app.sso.typing.model.User;
 import app.sso.typing.model.user.Titles;
 import app.sso.typing.repository.SysconfigRepository;
-import app.sso.typing.service.MessingupPasswd;
-import app.sso.typing.service.OidcClient;
-import app.sso.typing.service.UpdateMssql;
-import app.sso.typing.service.Userinfo;
+import app.sso.typing.repository.UserRepository;
+import app.sso.typing.service.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.oauth2.sdk.ParseException;
@@ -67,6 +65,11 @@ public class UserHomeController {
     @Autowired
     SysconfigRepository sysconfigrepository;
 
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    NexusService nexusService;
 
     private String typingid;
     private String typingpasswd;
@@ -86,7 +89,6 @@ public class UserHomeController {
 
             user.setAccesstoken(oidcClient.getAccessToken());
 
-
             user = userinfo.getUserinfo(user, user.getAccesstoken(), userinfo_endpoint);
             user = userinfo.getEduinfo(user, user.getAccesstoken(), eduinfo_endpoint);
 
@@ -97,10 +99,11 @@ public class UserHomeController {
 
 
             //決定密碼, 隨机取值, 這裡用state前5碼
-            typingpasswd = setTypingPasswd();
-            //logger.info("typingpasswd:" + typingpasswd);
+//            typingpasswd = setTypingPasswd();
+            typingpasswd = nexusService.getRandomPasswd();
 
-            //判斷身份別是否為學生
+
+            //判斷身份別是否為學生,老师前往teacher页面
             if (isStudent(user.getTitles())) {
 
                 typingid = setStudTypingID(user);
@@ -111,6 +114,13 @@ public class UserHomeController {
             } else {
 //            logger.info("不具學生身份");   //sub值為帳號,ex: igogo
                 //logger.info(mapper.writeValueAsString(user));
+
+                if (user.getSub().equals("igogo")) {
+                    userRepository.save(user);
+                    return new RedirectView("teacher/home");
+
+                }
+
                 typingid = user.getSub();
                 updatemssql.updateTeacherMssql(typingid, typingpasswd, user);
 
@@ -122,15 +132,19 @@ public class UserHomeController {
             String base64userid = Base64.getEncoder().encodeToString(typingid.getBytes());
             String base64passwd = Base64.getEncoder().encodeToString(typingpasswd.getBytes());
 
+
+            //以get的方式带帐号,密码过去win typing server
             attributes.addAttribute("userid", base64userid);
             attributes.addAttribute("passwd", base64passwd);
-//        logger.info("redirect url:"+ sysconfigrepository.findBySn("23952340").getUrl());
-            Instant instant = Instant.now();
-            long timestamp = instant.getEpochSecond();
 
-            String randomPasswd = String.format("%s%s", user.getAccesstoken().substring(0, 4), String.valueOf(timestamp).substring(0, 4));
-            //create a new thread waiting 10 seconds to random user's password
+            Instant instant = Instant.now();
+            String timestamp = String.valueOf(instant.getEpochSecond());
+
+            String randomPasswd = String.format("%s%s", user.getAccesstoken().substring(0, 4), timestamp.substring(timestamp.length() - 4, timestamp.length()));
+
+            //create a new thread waiting some seconds to random user's password
             messingupPasswd.execute(typingid, randomPasswd);
+
 
             //return new RedirectView("https://contest.tc.edu.tw/typeweb2/openidindex.asp?");
             return new RedirectView(sysconfigrepository.findBySn("23952340").getUrl());
@@ -152,10 +166,10 @@ public class UserHomeController {
         return id;
     }
 
-    private String setTypingPasswd() {
-        //決定密碼, 隨机取值, 這裡用state前5碼
-        return oidcClient.getState().toString().substring(0, 5);
-    }
+//    private String setTypingPasswd() {
+//        //決定密碼, 隨机取值, 這裡用state前5碼
+//        return oidcClient.getState().toString().substring(0, 5);
+//    }
 
     private String setStudTypingID(User user) throws NoSuchAlgorithmException {
         //決定學生的打字帳號, schoolid-gradeclassno-sub

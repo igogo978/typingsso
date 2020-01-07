@@ -7,6 +7,7 @@ package app.sso.typing.model;
 
 import app.sso.typing.model.user.Classinfo;
 import app.sso.typing.model.user.Titles;
+import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 public class User {
 
+    @Id
     private String username = "";
     private String schoolid = "";
     private List<Classinfo> classinfo = new ArrayList<Classinfo>();

@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -135,6 +136,10 @@ public class TypingApplication implements CommandLineRunner {
         }
 
         logger.info("update tc school db ok.");
+
+//        Instant instant = Instant.now();
+//        String timestamp = String.valueOf(instant.getEpochSecond());
+//        logger.info(String.format("timestamp: %s", timestamp.substring(timestamp.length() - 4, timestamp.length())));
 
 
 //        logger.info(repository.findBySchoolid("193525").getName());

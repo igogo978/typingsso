@@ -34,8 +34,6 @@ public class MessingupPasswd {
         Thread.sleep(waitingSeconds);
 //        logger.info(String.format("update user %s passwd", typingid));
 
-//        Instant instant = Instant.now();
-//        long timestamp = instant.getEpochSecond();
 
 
 //        String passwd = String.format("%s", Base64.getEncoder().encodeToString(String.valueOf(waitingSeconds).getBytes(StandardCharsets.UTF_8)).substring(0, 8));
