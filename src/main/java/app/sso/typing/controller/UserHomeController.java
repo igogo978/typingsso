@@ -9,7 +9,10 @@ import app.sso.typing.model.User;
 import app.sso.typing.model.user.Titles;
 import app.sso.typing.repository.SysconfigRepository;
 import app.sso.typing.repository.UserRepository;
-import app.sso.typing.service.*;
+import app.sso.typing.service.NexusService;
+import app.sso.typing.service.OidcClient;
+import app.sso.typing.service.TypingMssqlService;
+import app.sso.typing.service.Userinfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.oauth2.sdk.ParseException;
@@ -49,10 +52,10 @@ public class UserHomeController {
     Userinfo userinfo;
 
     @Autowired
-    UpdateMssql updatemssql;
+    TypingMssqlService updatemssql;
 
-    @Autowired
-    MessingupPasswd messingupPasswd;
+//    @Autowired
+//    MessingupPasswd messingupPasswd;
 
 
     @Value("${userinfo_endpoint}")
@@ -100,7 +103,7 @@ public class UserHomeController {
 
             //決定密碼, 隨机取值, 這裡用state前5碼
 //            typingpasswd = setTypingPasswd();
-            typingpasswd = nexusService.getRandomPasswd();
+            typingpasswd = nexusService.getRandomPasswd(5);
 
 
             //判斷身份別是否為學生,老师前往teacher页面
@@ -115,14 +118,12 @@ public class UserHomeController {
 //            logger.info("不具學生身份");   //sub值為帳號,ex: igogo
                 //logger.info(mapper.writeValueAsString(user));
 
-                if (user.getSub().equals("igogo")) {
-                    userRepository.save(user);
-                    return new RedirectView("teacher/home");
+                userRepository.save(user);
+                return new RedirectView("teacher/home");
 
-                }
 
-                typingid = user.getSub();
-                updatemssql.updateTeacherMssql(typingid, typingpasswd, user);
+//                typingid = user.getSub();
+//                updatemssql.updateTeacherMssql(typingid, typingpasswd, user);
 
             }
 
@@ -140,11 +141,8 @@ public class UserHomeController {
             Instant instant = Instant.now();
             String timestamp = String.valueOf(instant.getEpochSecond());
 
-            String randomPasswd = String.format("%s%s", user.getAccesstoken().substring(0, 4), timestamp.substring(timestamp.length() - 4, timestamp.length()));
-
             //create a new thread waiting some seconds to random user's password
-            messingupPasswd.execute(typingid, randomPasswd);
-
+            nexusService.messingupPasswd(typingid, nexusService.getRandomPasswd(timestamp));
 
             //return new RedirectView("https://contest.tc.edu.tw/typeweb2/openidindex.asp?");
             return new RedirectView(sysconfigrepository.findBySn("23952340").getUrl());
@@ -166,10 +164,6 @@ public class UserHomeController {
         return id;
     }
 
-//    private String setTypingPasswd() {
-//        //決定密碼, 隨机取值, 這裡用state前5碼
-//        return oidcClient.getState().toString().substring(0, 5);
-//    }
 
     private String setStudTypingID(User user) throws NoSuchAlgorithmException {
         //決定學生的打字帳號, schoolid-gradeclassno-sub

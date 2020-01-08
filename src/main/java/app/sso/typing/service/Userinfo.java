@@ -244,7 +244,7 @@ public class Userinfo {
 
         if (schoolRepository.countBySchoolid(schoolid) != 0) {
             school = schoolRepository.findBySchoolid(schoolid);
-            logger.info(String.format("schoolname: %s", school.getName()));
+//            logger.info(String.format("schoolname:  %s", school.getName()));
             return school.getName();
         } else {
             logger.info(schoolid);

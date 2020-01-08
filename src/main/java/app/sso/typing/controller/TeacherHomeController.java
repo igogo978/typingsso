@@ -23,7 +23,7 @@ public class TeacherHomeController {
     @Autowired
     OidcClient oidcClient;
 
-    private final Logger logger = LoggerFactory.getLogger(UserHomeController.class);
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     @RequestMapping("/typingsso/teacher/home")
@@ -31,15 +31,14 @@ public class TeacherHomeController {
 
         if (StringUtils.hasText(oidcClient.getAccessToken())) {
 
-//            String base64userid = Base64.getEncoder().encodeToString(typingid.getBytes());
-//            String base64passwd = Base64.getEncoder().encodeToString(typingpasswd.getBytes());
+
             User user = userRepository.findByAccesstoken(oidcClient.getAccessToken());
 
             model.addAttribute("userid", user.getSub());
 
-            logger.info("teacher page, userid: " + user.getSub());
-            logger.info("schoolid" + user.getSchoolid());
-            logger.info("schoolname" + user.getSchoolname());
+//            logger.info("teacher page, userid: " + user.getSub());
+//            logger.info("schoolid: " + user.getSchoolid());
+//            logger.info("schoolname: " + user.getSchoolname());
             return "teacher";
         }
         return "redirect:/";

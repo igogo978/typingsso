@@ -6,13 +6,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Base64;
 import java.util.Random;
 
 
@@ -33,7 +31,6 @@ public class MessingupPasswd {
         logger.info("waiting seconds to mess up user's password: " + String.valueOf(waitingSeconds / 1000));
         Thread.sleep(waitingSeconds);
 //        logger.info(String.format("update user %s passwd", typingid));
-
 
 
 //        String passwd = String.format("%s", Base64.getEncoder().encodeToString(String.valueOf(waitingSeconds).getBytes(StandardCharsets.UTF_8)).substring(0, 8));
@@ -72,7 +69,11 @@ public class MessingupPasswd {
         }
 
 
-        //validate passwd
+    }
+}
+
+
+//validate passwd
 //        sql = "SELECT * FROM dbo.users where userid=?";
 //        pstmt = conn.prepareStatement(sql);
 //        pstmt.setString(1, typingid);  //typingid
@@ -88,7 +89,3 @@ public class MessingupPasswd {
 //            ex.printStackTrace();
 //            logger.info(ex.getMessage());
 //        }
-
-
-    }
-}

@@ -4,10 +4,9 @@ package app.sso.typing.controller;
 import app.sso.typing.model.User;
 import app.sso.typing.repository.SysconfigRepository;
 import app.sso.typing.repository.UserRepository;
-import app.sso.typing.service.MessingupPasswd;
 import app.sso.typing.service.NexusService;
 import app.sso.typing.service.OidcClient;
-import app.sso.typing.service.UpdateMssql;
+import app.sso.typing.service.TypingMssqlService;
 import com.nimbusds.oauth2.sdk.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +40,8 @@ public class NexusController {
     NexusService nexusService;
 
     @Autowired
-    UpdateMssql updatemssql;
+    TypingMssqlService updatemssql;
 
-    @Autowired
-    MessingupPasswd messingupPasswd;
 
     private final Logger logger = LoggerFactory.getLogger(UserHomeController.class);
 
@@ -58,7 +55,7 @@ public class NexusController {
         } else {
             User user = userRepository.findByAccesstoken(oidcClient.getAccessToken());
 
-            String typingpasswd = nexusService.getRandomPasswd();
+            String typingpasswd = nexusService.getRandomPasswd(5);
             //update login records
 //            userinfo.updateUsage(user, typingid);
 
@@ -73,11 +70,10 @@ public class NexusController {
             Instant instant = Instant.now();
             String timestamp = String.valueOf(instant.getEpochSecond());
 
-            String randomPasswd = String.format("%s%s", user.getAccesstoken().substring(0, 4), timestamp.substring(timestamp.length() - 4, timestamp.length()));
+//            String randomPasswd = String.format("%s%s", user.getAccesstoken().substring(0, 4), timestamp.substring(timestamp.length() - 4, timestamp.length()));
 
             //create a new thread waiting some seconds to random user's password
-            messingupPasswd.execute(user.getSub(), randomPasswd);
-
+            nexusService.messingupPasswd(user.getSub(),nexusService.getRandomPasswd(timestamp));
 
             return new RedirectView(sysconfigrepository.findBySn("23952340").getUrl());
         }
