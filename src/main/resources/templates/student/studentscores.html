@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>我的打字記錄</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="home">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="scores">我的打字記錄</a>
+                </li>
+
+            </ul>
+
+        </div>
+    </nav>
+
+    <br>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">序號</th>
+            <th scope="col">語言</th>
+            <th scope="col">文章名稱</th>
+            <th scope="col">學校</th>
+            <th scope="col">班級</th>
+            <th scope="col">姓名</th>
+            <th scope="col">正確字數</th>
+            <th scope="col">錯誤字數</th>
+            <th scope="col">速度</th>
+            <th scope="col">正確率</th>
+            <th scope="col">時間</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${typingscores}">
+            <td th:text="${item.id}">id</td>
+            <td th:text="${item.lang}">lang</td>
+            <td th:text="${item.typingsubject}">subject</td>
+            <td th:text="${item.schoolname}">schoolname</td>
+            <td th:text="${item.classname}">classname</td>
+            <td th:text="${item.myname}">myname</td>
+            <td th:text="${item.rightcount}">rightcount</td>
+            <td th:text="${item.wrongcount}">wrongcount</td>
+            <td th:text="${item.typingspeed}">typing speed</td>
+            <td th:text="${item.accuracy}">typing accuracy</td>
+            <td th:text="${item.posttime}">posttime</td>
+        </tr>
+
+        </tbody>
+    </table>
+
+
+
+
+</div>
+
+</body>
+</html>

@@ -25,6 +25,7 @@ public class User {
     private String schoolname = "";
     private String sub = "";
     private String accesstoken = "";
+    private String typingid="";
 
     public String getSub() {
         return sub;
@@ -81,5 +82,13 @@ public class User {
 
     public void setAccesstoken(String accesstoken) {
         this.accesstoken = accesstoken;
+    }
+
+    public String getTypingid() {
+        return typingid;
+    }
+
+    public void setTypingid(String typingid) {
+        this.typingid = typingid;
     }
 }

@@ -108,7 +108,68 @@ public class TypingMssqlService {
         return subject;
     }
 
+    public List<Typingscores> getMyTypingScores(String typingid) throws ClassNotFoundException, JsonProcessingException {
+        String connectionUrl = "jdbc:sqlserver://163.17.39.33:1433;"
+                + "databaseName=type_db;user=game2;password=pwdpwd";
+        String sql = "SELECT * FROM typing WHERE userid = ? ORDER BY id DESC ";
+//        String sql = "SELECT TOP 5 * FROM typing ORDER BY id DESC ";
 
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
+        List<Typingscores> typingscoresList = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(connectionUrl);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, typingid);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Typingscores typingscores = new Typingscores();
+                    typingscores.setId(rs.getString("id"));
+                    typingscores.setScores(rs.getString("score"));
+
+
+                    String lang = "";
+                    if (rs.getString("lang").equals("1")) {
+                        lang = "中";
+                    } else {
+                        lang = "英";
+                    }
+                    typingscores.setLang(lang);
+                    typingscores.setPosttime(rs.getString("posttime"));
+                    typingscores.setGame_year(rs.getString("game_year"));
+                    typingscores.setUserid(rs.getString("userid")); //login id
+                    typingscores.setRightcount(rs.getString("rightcount") + "字");
+                    typingscores.setWrongcount(rs.getString("wrongcount") + "字");
+                    typingscores.setMyname(rs.getString("myname"));
+                    typingscores.setTypingsubject(getTypingArticleSubject(rs.getString("typeid")));
+                    typingscores.setSchoolname(rs.getString("schoolname"));
+//                    logger.info(rs.getString("posttime").substring(0,16));
+                    typingscores.setPosttime(rs.getString("posttime").substring(0,16));
+                    typingscores.setIp(rs.getString("ip"));
+
+                    typingscores.setClassname(typingscores.getUserid().split("-")[1]);
+                    String typingspeed = String.format("%s 字/分", rs.getInt("rightcount") / 10.0);
+                    typingscores.setTypingspeed(typingspeed);
+
+                    float accuracy = rs.getInt("rightcount") / (float) (rs.getInt("rightcount") + rs.getInt("wrongcount")) * 100;
+                    DecimalFormat df = new DecimalFormat();
+                    df.setMaximumFractionDigits(1);
+//                    logger.info("accuracy: " + df.format(accuracy));
+                    typingscores.setAccuracy(String.valueOf(df.format(accuracy)) + "%");
+//                    logger.info(mapper.writeValueAsString(typingscores));
+                    typingscoresList.add(typingscores);
+                }
+
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return typingscoresList;
+
+    }
 
 
 
