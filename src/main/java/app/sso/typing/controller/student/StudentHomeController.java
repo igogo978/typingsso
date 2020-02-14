@@ -36,7 +36,8 @@ public class StudentHomeController {
             String grade = user.getClassinfo().get(0).getGrade();
             String classno = user.getClassinfo().get(0).getClassno();
 
-            model.addAttribute("username", String.format("%s%s %s", grade, classno, user.getUsername()));
+//            model.addAttribute("username", String.format("%s%s %s", grade, classno, user.getUsername()));
+            model.addAttribute("username", String.format("%s", user.getUsername()));
 
             return "student/student";
         }

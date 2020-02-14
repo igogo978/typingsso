@@ -72,7 +72,7 @@ public class CallbackController {
 
         // 成功取得authorization code
         AuthorizationCode code = successResponse.getAuthorizationCode();
-        logger.info("3. authz code grant.");
+        logger.info("3. authz code grant. " + code.getValue());
 //        logger.info("code:" + code.toString());
 
 //        if (oidcClient.getState() == null) {

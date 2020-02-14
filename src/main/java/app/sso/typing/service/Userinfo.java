@@ -82,16 +82,15 @@ public class Userinfo {
 
         UserInfoSuccessResponse successUserInfoResponse = (UserInfoSuccessResponse) userInfoResponse;
         String userinfo = successUserInfoResponse.getUserInfo().toJSONObject().toString();
+        logger.info("userinfo: " + userinfo);
         root = mapper.readTree(userinfo);
 
         user.setUsername(root.get("name").asText());
 
         logger.info("user name:" + root.get("name").asText());
-        logger.info(String.format("userinfo:%s,%s",user.getUsername(),userAccessToken));
+        logger.info(String.format("userinfo:%s,%s", user.getUsername(), userAccessToken));
         return user;
     }
-
-
 
 
 //    public User getUserinfo(User user, String endpoint) throws URISyntaxException, IOException, ParseException {
@@ -153,17 +152,19 @@ public class Userinfo {
         }
 
         UserInfoSuccessResponse successUserInfoResponse = (UserInfoSuccessResponse) userInfoResponse;
-        String userinfo = successUserInfoResponse.getUserInfo().toJSONObject().toString();
+        String eduinfo = successUserInfoResponse.getUserInfo().toJSONObject().toString();
+
+        logger.info("eduinfo: " + eduinfo);
 //        logger.info("eduinfo:" + userinfo);
 
 //        {"sub":"096031996","classinfo":[{"year":null,"classtitle":"五年丁班","schoolid":"064757","grade":"5","classno":"04","semester":null}],"titles":[{"schoolid":"064757","titles":["學生"]}],"schoolid":"064757"}
-        user.setSub(mapper.readTree(userinfo).get("sub").asText());
-        user.setSchoolid(mapper.readTree(userinfo).get("schoolid").asText());
-        root = mapper.readTree(userinfo).get("titles");
+        user.setSub(mapper.readTree(eduinfo).get("sub").asText());
+        user.setSchoolid(mapper.readTree(eduinfo).get("schoolid").asText());
+        root = mapper.readTree(eduinfo).get("titles");
 
         Titles[] titles = mapper.treeToValue(root, Titles[].class);
         user.setTitles(Arrays.asList(titles));
-        root = mapper.readTree(userinfo).get("classinfo");
+        root = mapper.readTree(eduinfo).get("classinfo");
 
         for (Titles title : titles) {
             Boolean id = title.getTitles().stream().anyMatch(name -> name.matches("學生"));
@@ -177,8 +178,6 @@ public class Userinfo {
 
         return user;
     }
-
-
 
 
 //

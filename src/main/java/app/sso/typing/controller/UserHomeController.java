@@ -30,8 +30,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.time.Instant;
-import java.util.Base64;
 import java.util.List;
 
 /**
@@ -99,8 +97,6 @@ public class UserHomeController {
             user.setSchoolname(userinfo.getSchoolname(user.getSchoolid()));
 
 
-
-
             //決定密碼, 隨机取值, 這裡用state前5碼
 //            typingpasswd = setTypingPasswd();
             typingpasswd = nexusService.getRandomPasswd(5);
@@ -109,14 +105,11 @@ public class UserHomeController {
             //判斷身份別是否為學生,老师前往teacher页面
             if (isStudent(user.getTitles())) {
 
+                typingid = String.format("%s-%s", user.getSchoolid(), user.getSub());
 
+                logger.info("student typingid: " + typingid);
+                user.setTypingid(typingid);
 
-                user.setTypingid(setStudTypingID(user));
-
-//                if (typingid.equals("064643-601-096100766")){
-//                    userRepository.save(user);
-//                    return new RedirectView("student/home");
-//                }
 
                 userRepository.save(user);
 
@@ -126,10 +119,6 @@ public class UserHomeController {
 
                 return new RedirectView("student/home");
 
-
-                //064757-504-sub value
-                //更新學生mssql 資料
-//                updatemssql.updateStudentMssql(typingid, typingpasswd, user);
 
             } else {
 //            logger.info("不具學生身份");   //sub值為帳號,ex: igogo
@@ -149,23 +138,6 @@ public class UserHomeController {
             }
 
 
-
-//            String base64userid = Base64.getEncoder().encodeToString(typingid.getBytes());
-//            String base64passwd = Base64.getEncoder().encodeToString(typingpasswd.getBytes());
-
-
-            //以get的方式带帐号,密码过去win typing server
-//            attributes.addAttribute("userid", base64userid);
-//            attributes.addAttribute("passwd", base64passwd);
-//
-//            Instant instant = Instant.now();
-//            String timestamp = String.valueOf(instant.getEpochSecond());
-//
-//            //create a new thread waiting some seconds to random user's password
-//            nexusService.messingupPasswd(typingid, nexusService.getRandomPasswd(timestamp));
-
-            //return new RedirectView("https://contest.tc.edu.tw/typeweb2/openidindex.asp?");
-//            return new RedirectView(sysconfigrepository.findBySn("23952340").getUrl());
         }
 
 
@@ -186,12 +158,9 @@ public class UserHomeController {
 
 
     private String setStudTypingID(User user) throws NoSuchAlgorithmException {
-        //決定學生的打字帳號, schoolid-gradeclassno-sub
+        //決定學生的打字帳號, schoolid-sub
 
-        String grade = user.getClassinfo().get(0).getGrade();
-        String classno = user.getClassinfo().get(0).getClassno();
-        //064757-504-nFf2I
-        return String.format("%s-%s%s-%s", user.getSchoolid(), grade, classno, user.getSub());
+        return String.format("%s-%s%s-%s", user.getSchoolid(), user.getSub());
     }
 
 }
