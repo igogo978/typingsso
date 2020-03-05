@@ -88,7 +88,7 @@ public class TypingApplication implements CommandLineRunner {
             sysconfigrepository.save(new Sysconfig("23952340", url));
 
         } else {
-            System.out.println("無設定檔");
+            System.out.println("lack of sysconfig");
             System.exit(0);
         }
 
