@@ -1,14 +1,14 @@
 
 
-clientid=CLIENTID
-secret=	SECRET
+clientid=a669e254ede074c1d5203d3cd592d2e1
+secret=cd7be335ddf16f9a4adf0651349b66424ee2ee2a217efabd96b710f91ea2fd44
 #openid_wellknown_uri=https://oidc.tanet.edu.tw/.well-known/openid-configuration
 callback=https://ssoid.tc.edu.tw/typingsso/callback
 
 authorization_endpoint=https://tc.sso.edu.tw/oidc/v1/azp
 token_endpoint=https://tc.sso.edu.tw/oidc/v1/token
 userinfo_endpoint=https://tc.sso.edu.tw/oidc/v1/userinfo
-eduinfo_endpoint=https://tc.sso.edu.tw/cncresource/api/v1/eduinfo
+eduinfo_endpoint=https://tc.sso.edu.tw/cncresource/api/v2/eduinfo
 
 
 spring.thymeleaf.cache=false
@@ -19,15 +19,21 @@ server.port=8080
 server.tomcat.max-threads=100
 
 #server.session.timeout=180
-#server.session.cookie.max-age=180
-server.servlet.session.timeout=180
+#server.session.cookie.max-age=11
+server.servlet.session.timeout=3600s
 
 #server.ssl.key-store=classpath:keystore.jks
 #server.ssl.key-store-password=itaichung
 #server.ssl.key-password=itaichung
 
 spring.data.mongodb.database=typingsso
+spring.data.mongodb.option.socket-timeout=0
+spring.data.mongodb.socket-keep-alive=true
 
+
+
+#clientid=432402061677-efgglqdekafcatd4ud9j8pgo1osvo06o.apps.googleusercontent.com
+#secret=9gKP88aWBQDxu62_Jp8foea8
 #authorization_endpoint=https://accounts.google.com/o/oauth2/v2/auth
 #token_endpoint=https://www.googleapis.com/oauth2/v4/token
 #userinfo_endpoint=https://www.googleapis.com/oauth2/v3/userinfo
