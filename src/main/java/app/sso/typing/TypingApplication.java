@@ -13,6 +13,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.request.RequestContextListener;
@@ -29,15 +31,15 @@ import java.util.stream.Collectors;
 
 @SpringBootApplication
 @EnableAsync
+@EnableMongoRepositories
 public class TypingApplication implements CommandLineRunner {
 
 
     @Autowired
-    SchoolRepository repository;
+    SchoolRepository schoolRepository;
 
     @Autowired
     SysconfigRepository sysconfigrepository;
-
 
     private static final Logger logger = LoggerFactory.getLogger(TypingApplication.class);
 
@@ -47,7 +49,6 @@ public class TypingApplication implements CommandLineRunner {
     public RequestContextListener requestContextListener() {
         return new RequestContextListener();
     }
-
 
     @Bean
     public Executor asyncExecutor() {
@@ -93,13 +94,12 @@ public class TypingApplication implements CommandLineRunner {
         }
 
 
-        logger.info(mapper.writeValueAsString(sysconfigrepository.findBySn("23952340")));
+//        logger.info(mapper.writeValueAsString(sysconfigrepository.findBySn("23952340")));
 
 
 //        TimeZone.setDefault(TimeZone.getTimeZone("CST"));
         logger.info("updating tcschool data");
 
-        System.out.println("now time: " + java.time.LocalDateTime.now());
 
         String csvfile = String.format("%s/%s", cwd, "tcschools.csv");
         //確認設定檔
@@ -118,14 +118,14 @@ public class TypingApplication implements CommandLineRunner {
 //            splits.forEach(name -> logger.info(String.format("TC school information for %s,%s", name[0], name[1])));
 
             //删除全部学校
-            repository.deleteAll();
+            schoolRepository.deleteAll();
 
 
             splits.forEach(school -> {
                 System.out.println(String.format("%s:%s", school[0].toString(), school[1].toString()));
-                repository.save(new School(school[0].toString(), school[1].toString()));
-                if (repository.countBySchoolid(school[0].toString()) == 0) {
-                    repository.save(new School(school[0].toString(), school[1].toString()));
+                schoolRepository.save(new School(school[0].toString(), school[1].toString()));
+                if (schoolRepository.countBySchoolid(school[0].toString()) == 0) {
+                    schoolRepository.save(new School(school[0].toString(), school[1].toString()));
                 }
             });
 
@@ -135,7 +135,7 @@ public class TypingApplication implements CommandLineRunner {
             System.exit(0);
         }
 
-        logger.info("update tc school db ok.");
+        logger.info("web service is running...");
 
 //        Instant instant = Instant.now();
 //        String timestamp = String.valueOf(instant.getEpochSecond());

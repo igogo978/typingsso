@@ -15,7 +15,7 @@ public class Classinfo {
     private String schoolid;
     private String grade;
     private String classno;
-//    private String semester;
+    private String semester;
     private String seatno;
 
     public String getYear() {
@@ -66,12 +66,12 @@ public class Classinfo {
         this.seatno = seatno;
     }
 
-    //    public String getSemester() {
-//        return semester;
-//    }
-//
-//    public void setSemester(String semester) {
-//        this.semester = semester;
-//    }
-//
+        public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
+    }
+
 }

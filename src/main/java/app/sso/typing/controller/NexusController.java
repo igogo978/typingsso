@@ -46,7 +46,7 @@ public class NexusController {
     private final Logger logger = LoggerFactory.getLogger(UserHomeController.class);
 
 
-    @RequestMapping("/typingsso/nexus")
+    @RequestMapping("/nexus")
     public RedirectView teacherNexus(RedirectAttributes attributes) throws URISyntaxException, ParseException, IOException, ClassNotFoundException, SQLException, NoSuchAlgorithmException, InterruptedException {
         if (!StringUtils.hasText(oidcClient.getAccessToken())) {
 //            沒有登入,返回登入首頁
@@ -74,15 +74,16 @@ public class NexusController {
 
             //create a new thread waiting some seconds to random user's password
             nexusService.messingupPasswd(user.getSub(), nexusService.getRandomPasswd(timestamp));
+            String url = sysconfigrepository.findBySn("23952340").get().getUrl();
 
-            return new RedirectView(sysconfigrepository.findBySn("23952340").getUrl());
+            return new RedirectView(url);
         }
 
 
     }
 
 
-    @RequestMapping("/typingsso/student/nexus")
+    @RequestMapping("/student/nexus")
     public RedirectView studentNexus(RedirectAttributes attributes) throws URISyntaxException, ParseException, IOException, ClassNotFoundException, SQLException, NoSuchAlgorithmException, InterruptedException {
         if (!StringUtils.hasText(oidcClient.getAccessToken())) {
 //            沒有登入,返回登入首頁
@@ -111,8 +112,8 @@ public class NexusController {
 
             //create a new thread waiting some seconds to random user's password
             nexusService.messingupPasswd(user.getTypingid(), nexusService.getRandomPasswd(timestamp));
-
-            return new RedirectView(sysconfigrepository.findBySn("23952340").getUrl());
+            String url = sysconfigrepository.findBySn("23952340").get().getUrl();
+            return new RedirectView(url);
         }
 
 

@@ -32,7 +32,7 @@ public class TeacherScoesController {
     @Autowired
     UserRepository userRepository;
 
-    @GetMapping("/typingsso/teacher/scores")
+    @GetMapping("/teacher/scores")
     public String getScores(Model model) throws ClassNotFoundException, SQLException, JsonProcessingException {
         List<Typingscores> typingscoresList;
         if (StringUtils.hasText(oidcClient.getAccessToken())) {

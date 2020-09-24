@@ -4,41 +4,79 @@
     <title>Teacher's Home</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
 </head>
 <body>
-<div class="container">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+           <div class="collapse navbar-collapse" id="navbarSupportedContent">
+               <ul class="navbar-nav mr-auto">
+                   <li class="nav-item active">
+                     <a class="nav-link" href="home">Home <span class="sr-only">(current)</span></a>
+                   </li>
+                   <li class="nav-item">
+                      <a class="nav-link" href="scores">觀看學生打字記錄</a>
+                   </li>
+                </ul>
+           </div>
+        </nav>
+        <br>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div id="app">
 
+            <h3>
+                <div th:text="'Welcome, ' + ${userid} "> userid</div>
+            </h3>
+            <br>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="home">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="scores">觀看學生打字記錄</a>
-                </li>
+            <a href="/typingsso/nexus" class="btn btn-outline-dark" role="button" aria-pressed="true" target="_blank">前往打字頁面</a>
+            <br>
+            <br>
+            <br>
 
-            </ul>
-
+            <div>
+                現在主機時間: {{new Date(timestamp*1000).toLocaleDateString('zh-TW')}} {{new Date(timestamp*1000).toLocaleTimeString('zh-TW')}}
+                {{updateTime}}
+            </div>
         </div>
-    </nav>
-    <br>
-    <h3>
-        <div th:text="'Welcome, '+${userid}"> userid</div>
-
-    </h3>
-    <br>
-
-    <a href="/typingsso/nexus" class="btn btn-outline-dark" role="button" aria-pressed="true" target="_blank">前往打字頁面</a>
+    </div>
 
 
-</div>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+    <script th:inline="javascript">
+        console.log("hello,world");
+      /*<![CDATA[*/
+
+        var app = new Vue({
+          el: '#app',
+          data: {
+            msg: 'You loaded this page on ' + new Date().toLocaleString(),
+            timestamp: /*[[${timestamp}]]*/ 'timestamp'
+          },
+          computed: {
+             updateTime: function () {
+                 setInterval(() => {
+                        this.timestamp++ ;
+                 }, 1000);
+            }
+          },
+          methods: {
+
+          }
+
+        })
+
+
+
+       /*]]>*/
+</script>
+
 
 </body>
 </html>

@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/typingsso/api/usage")
+@RequestMapping("/api/usage")
 public class UsageStatics {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -42,21 +42,8 @@ public class UsageStatics {
     @RequestMapping(value = "/hours", method = RequestMethod.GET)
     public List<UsageReport> byHours(HttpServletResponse response) throws IOException {
         ArrayList<UsageReport> reports = new ArrayList<>();
-//        if (!StringUtils.hasText(oidcClient.getAccessToken())) {
-////            沒有登入,返回登入首頁
-//            logger.info("未取得access token");
-//
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setLocation(URI.create("/"));
-//
-//            response.sendRedirect("/");
-//
-//        }
-
 
         long duration;
-        //find all
-//        reports.add(findAll());
 
         Instant instant = Instant.now();
         long timestamp = instant.getEpochSecond();
@@ -66,9 +53,6 @@ public class UsageStatics {
             endtime = timestamp - (i * duration);
             reports.add(findByHoursDuration(endtime, duration));
         }
-
-
-//        logger.info(String.format("timestamp greater than %d", timestamp));
         return reports;
 
     }
@@ -76,18 +60,6 @@ public class UsageStatics {
 
     @RequestMapping(value = "/days", method = RequestMethod.GET)
     public List<UsageReport> byDays(HttpServletResponse response) throws IOException {
-
-//        if (!StringUtils.hasText(oidcClient.getAccessToken())) {
-////            沒有登入,返回登入首頁
-//            logger.info("未取得access token");
-//
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setLocation(URI.create("/"));
-//
-//            response.sendRedirect("/");
-//
-//        }
-
 
         List<UsageReport> reports = new ArrayList<>();
         long duration;
@@ -171,22 +143,5 @@ public class UsageStatics {
 
         return report;
     }
-
-
-//    @RequestMapping(value = "/days/{number}", method = RequestMethod.GET)
-//    public List<Usage> byDaysTimestamp(@PathVariable("number") Optional<Integer> number) {
-//        int days = 7;
-//        if (number.isPresent()) {
-//            days = number.get();
-//        }
-//
-//        logger.info("days:" + days);
-//        Instant instant = Instant.now();
-//        long timestamp = instant.getEpochSecond() - ((int) (60 * 60 * 24 * days));
-//        logger.info(String.format("timestamp greater than %d", timestamp));
-//        return repository.findByTimestampGreatThan((long) timestamp);
-//
-//    }
-
 
 }

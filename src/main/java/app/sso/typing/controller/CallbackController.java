@@ -58,9 +58,8 @@ public class CallbackController {
     @Value("${token_endpoint}")
     private String token_endpoint;
 
-    @RequestMapping("/typingsso/callback")
+    @RequestMapping("/callback")
     public ResponseEntity<Object> callback(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws URISyntaxException, ParseException, IOException, InterruptedException {
-//https://type.wtps.tc.edu.tw/typingsso/callback?state=cIyvCscGfuXjvscILbkKs7LQG_uTMb3A4KyEk6rXL-U&code=4%2FAAB4AwrNKr8GoGGAc_GYCxocY7IG8ptkGcKycRxiDUcVKT1uXDP7DuO6AIVbbDsv-_Ad39BkjuwY48LCWqtpHOk&authuser=0&hd=tc.edu.tw&session_state=fe3c6696b362d3b26776de50d28392176878e301..be69&prompt=consent#
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/"));
 
@@ -73,7 +72,6 @@ public class CallbackController {
         // 成功取得authorization code
         AuthorizationCode code = successResponse.getAuthorizationCode();
         logger.info("3. authz code grant. " + code.getValue());
-//        logger.info("code:" + code.toString());
 
 //        if (oidcClient.getState() == null) {
 //            logger.warn("state code is NULL");
@@ -135,7 +133,7 @@ public class CallbackController {
 
         }
 
-        headers.setLocation(URI.create("/typingsso/userhome"));
+        headers.setLocation(URI.create("userhome"));
 
 //        response.sendRedirect("/typingsso/userhome");
         return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);

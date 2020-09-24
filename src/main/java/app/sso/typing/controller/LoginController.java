@@ -49,7 +49,7 @@ public class LoginController {
     private String authorization_endpoint;
     private URI oauth2callback;
 
-    @RequestMapping("/typingsso/login")
+    @RequestMapping("/login")
     public RedirectView login(RedirectAttributes attributes) throws URISyntaxException {
         oidcClient.setState(new State());
         oidcClient.setNonce(new Nonce());
@@ -76,7 +76,7 @@ public class LoginController {
         attributes.addAttribute("scope", authzReq.getScope().toString());
         attributes.addAttribute("state", authzReq.getState());
         attributes.addAttribute("nonce", authzReq.getNonce());
-
+        logger.info("redirect uri: " + authzReq.getRedirectionURI().toString());
         return new RedirectView(authorization_endpoint);
     }
 }

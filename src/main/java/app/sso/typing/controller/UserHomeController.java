@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +38,7 @@ import java.util.List;
  */
 //@RestController
 @Controller
+@Scope("prototype")
 public class UserHomeController {
 
     private final Logger logger = LoggerFactory.getLogger(UserHomeController.class);
@@ -51,10 +53,6 @@ public class UserHomeController {
 
     @Autowired
     TypingMssqlService updatemssql;
-
-//    @Autowired
-//    MessingupPasswd messingupPasswd;
-
 
     @Value("${userinfo_endpoint}")
     private String userinfo_endpoint;
@@ -76,7 +74,7 @@ public class UserHomeController {
     private String typingpasswd;
 
 
-    @RequestMapping("/typingsso/userhome")
+    @RequestMapping("/userhome")
     public RedirectView userhome(RedirectAttributes attributes) throws URISyntaxException, ParseException, IOException, ClassNotFoundException, SQLException, NoSuchAlgorithmException, InterruptedException {
         if (!StringUtils.hasText(oidcClient.getAccessToken())) {
 //            沒有登入,返回登入首頁
@@ -131,10 +129,6 @@ public class UserHomeController {
 
                 return new RedirectView("teacher/home");
 
-
-//                typingid = user.getSub();
-//                updatemssql.updateTeacherMssql(typingid, typingpasswd, user);
-
             }
 
 
@@ -143,7 +137,7 @@ public class UserHomeController {
 
     }
 
-    @RequestMapping("/typingsso/invalid")
+    @RequestMapping("/invalid")
     public String invalidUser() {
         return "invalid";
     }

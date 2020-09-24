@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class WelcomeController {
     
     //未登入的頁面 一律導到這裡
-    @RequestMapping("/typingsso/welcome")
+    @RequestMapping("/welcome")
     public String welcome() {
         return "welcome";
     }

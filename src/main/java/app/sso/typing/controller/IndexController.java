@@ -23,6 +23,6 @@ public class IndexController {
     public RedirectView index(RedirectAttributes attributes) {
 //        attributes.addFlashAttribute("flashAttribute", "redirectWithRedirectView");
 //        attributes.addAttribute("attribute", "redirectWithRedirectView");
-        return new RedirectView("typingsso/welcome");
+        return new RedirectView("welcome");
     }
 }

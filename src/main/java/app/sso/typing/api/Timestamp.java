@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author igogo
  */
 @RestController
-@RequestMapping("/typingsso/api/timestamp")
+@RequestMapping("/api/timestamp")
 public class Timestamp {
 
     private static final Logger logger = LoggerFactory.getLogger(Timestamp.class);
@@ -31,6 +31,7 @@ public class Timestamp {
     String getNowtime() {
 //        LocalDateTime now = LocalDateTime.now();
         Instant instant = Instant.now();
+        logger.info(String.valueOf(instant.getEpochSecond()));
         ZonedDateTime now = instant.atZone(ZoneId.of("Asia/Taipei"));
         return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(now);
 

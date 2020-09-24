@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.UnsupportedEncodingException;
+import java.time.Instant;
 
 @Controller
 public class StudentHomeController {
@@ -26,11 +27,13 @@ public class StudentHomeController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
-    @RequestMapping("/typingsso/student/home")
+    @RequestMapping("/student/home")
     public String teacher(Model model) throws UnsupportedEncodingException {
 
         if (StringUtils.hasText(oidcClient.getAccessToken())) {
 
+            Instant instant = Instant.now();
+            String timestamp = String.valueOf(instant.getEpochSecond());
 
             User user = userRepository.findByAccesstoken(oidcClient.getAccessToken());
             String grade = user.getClassinfo().get(0).getGrade();
@@ -38,6 +41,8 @@ public class StudentHomeController {
 
 //            model.addAttribute("username", String.format("%s%s %s", grade, classno, user.getUsername()));
             model.addAttribute("username", String.format("%s", user.getUsername()));
+            model.addAttribute("timestamp", timestamp);
+
 
             return "student/student";
         }

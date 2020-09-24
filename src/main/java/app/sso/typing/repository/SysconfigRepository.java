@@ -4,6 +4,8 @@ import app.sso.typing.model.School;
 import app.sso.typing.model.Sysconfig;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.Optional;
+
 public interface SysconfigRepository extends MongoRepository<Sysconfig, String> {
-    public Sysconfig findBySn(String sn);
+    public Optional<Sysconfig> findBySn(String sn);
 }

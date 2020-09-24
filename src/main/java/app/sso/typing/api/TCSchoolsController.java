@@ -33,10 +33,6 @@ public class TCSchoolsController {
     private static final Logger logger = LoggerFactory.getLogger(TCSchoolsController.class);
 //    School school;
 
-
-
-
-
 //    @RequestMapping(method = RequestMethod.GET)
 //    public School getschoolinfo(@PathVariable String schoolid) {
 //

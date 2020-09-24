@@ -2,6 +2,7 @@ package app.sso.typing.repository;
 
 import app.sso.typing.model.School;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
